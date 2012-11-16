@@ -228,7 +228,7 @@ namespace glsl {
 				data[i] = 0;
 			}
 			for (unsigned i = 0; i < m; ++i) {
-				data[i] = a.data[i];
+				data[i] = a[i];
 			}
 		}
 		
