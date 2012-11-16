@@ -223,10 +223,15 @@ namespace glsl {
 
 	TEST(VecTest, HandlesSwizzles) {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+		vec3 b, c;
 
-		EXPECT_EQ(vec3(1.0f, 2.0f, 3.0f), vec3(a.xyz));
+		EXPECT_EQ(vec3(1.0f, 2.0f, 3.0f), a.xyz);
+		EXPECT_EQ(a.xyz, vec3(a.xyz));
 		EXPECT_EQ(vec4(2.0f, 2.0f, 4.0f, 4.0f), a.yyww);
 		EXPECT_EQ(vec2(1.0f, 3.0f), a.xyz.xz);
+		b = c = a.yzw;
+		EXPECT_EQ(c, a.yzw);
+		EXPECT_EQ(b, a.yzw);
 	}
 }
 
