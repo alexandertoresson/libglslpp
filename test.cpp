@@ -215,6 +215,12 @@ namespace glsl {
 		EXPECT_EQ(vec4(1.0f, vec3(2.0f, 3.0f, 4.0f)), a);
 	}
 	
+	TEST(VecTest, HandlesAssignment) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f), b = a;
+
+		EXPECT_EQ(b, a);
+	}
+
 	TEST(VecTest, HandlesSwizzles) {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
 
