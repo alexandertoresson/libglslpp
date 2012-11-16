@@ -204,6 +204,16 @@ namespace glsl {
 		return 0;
 	}
 
+	TEST(VecTest, HandlesConstructors) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+
+		EXPECT_EQ(a[0], 1.0f); EXPECT_EQ(a[1], 2.0f); EXPECT_EQ(a[2], 3.0f); EXPECT_EQ(a[3], 4.0f);
+		EXPECT_EQ(vec2(1.0f), vec2(1.0f, 1.0f));
+		EXPECT_EQ(vec4(a), a);
+		EXPECT_EQ(vec3(vec2(1.0f, 2.0f), 3.0f), vec3(1.0f, 2.0f, 3.0f));
+		EXPECT_EQ(vec4(vec2(1.0f, 2.0f), vec2(3.0f, 4.0f)), a);
+		EXPECT_EQ(vec4(1.0f, vec3(2.0f, 3.0f, 4.0f)), a);
+	}
 }
 
 int main(int argc, char **argv)
