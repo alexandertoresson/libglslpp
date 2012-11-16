@@ -207,26 +207,26 @@ namespace glsl {
 	TEST(VecTest, HandlesConstructors) {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
 
-		EXPECT_EQ(a[0], 1.0f); EXPECT_EQ(a[1], 2.0f); EXPECT_EQ(a[2], 3.0f); EXPECT_EQ(a[3], 4.0f);
-		EXPECT_EQ(vec2(1.0f), vec2(1.0f, 1.0f));
-		EXPECT_EQ(vec4(a), a);
-		EXPECT_EQ(vec3(vec2(1.0f, 2.0f), 3.0f), vec3(1.0f, 2.0f, 3.0f));
-		EXPECT_EQ(vec4(vec2(1.0f, 2.0f), vec2(3.0f, 4.0f)), a);
-		EXPECT_EQ(vec4(1.0f, vec3(2.0f, 3.0f, 4.0f)), a);
+		EXPECT_EQ(1.0f, a[0]); EXPECT_EQ(2.0f, a[1]); EXPECT_EQ(3.0f, a[2]); EXPECT_EQ(4.0f, a[3]);
+		EXPECT_EQ(vec2(1.0f, 1.0f), vec2(1.0f));
+		EXPECT_EQ(a, vec4(a));
+		EXPECT_EQ(vec3(1.0f, 2.0f, 3.0f), vec3(vec2(1.0f, 2.0f), 3.0f));
+		EXPECT_EQ(a, vec4(vec2(1.0f, 2.0f), vec2(3.0f, 4.0f)));
+		EXPECT_EQ(a, vec4(1.0f, vec3(2.0f, 3.0f, 4.0f)));
 	}
 	
 	TEST(VecTest, HandlesAssignment) {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f), b = a;
 
-		EXPECT_EQ(b, a);
+		EXPECT_EQ(a, b);
 	}
 
 	TEST(VecTest, HandlesSwizzles) {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
 
-		EXPECT_EQ(vec3(a.xyz), vec3(1.0f, 2.0f, 3.0f));
-		EXPECT_EQ(a.yyww, vec4(2.0f, 2.0f, 4.0f, 4.0f));
-		EXPECT_EQ(a.xyz.xz, vec2(1.0f, 3.0f));
+		EXPECT_EQ(vec3(1.0f, 2.0f, 3.0f), vec3(a.xyz));
+		EXPECT_EQ(vec4(2.0f, 2.0f, 4.0f, 4.0f), a.yyww);
+		EXPECT_EQ(vec2(1.0f, 3.0f), a.xyz.xz);
 	}
 }
 
