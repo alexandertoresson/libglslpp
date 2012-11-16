@@ -175,6 +175,17 @@ namespace glsl {
 			return *this;
 		}
 
+		rvec<T, 2> to_rvec(unsigned a, unsigned b) {
+			return rvec<T, 2>(*this[a], *this[b]);
+		}
+
+		rvec<T, 3> to_rvec(unsigned a, unsigned b, unsigned c) {
+			return rvec<T, 3>(*this[a], *this[b], *this[c]);
+		}
+
+		rvec<T, 4> to_rvec(unsigned a, unsigned b, unsigned c, unsigned d) {
+			return rvec<T, 4>(*this[a], *this[b], *this[c], *this[d]);
+		}
 	};
 
 	template <typename T, unsigned n>
