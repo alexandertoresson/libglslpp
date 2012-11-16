@@ -507,6 +507,19 @@ namespace glsl {
 		return map(a, b, div_assign<T, U>);
 	}
 
+	/* EQUAL */
+
+	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
+	bool operator == (const C1<U, n>& a, const C2<V, n>& b) {
+		for (unsigned i = 0; i < n; ++i) {
+			if (a[i] != b[i])
+				return false;
+		}
+		return true;
+	}
+
+	// TODO: Other operators
+
 	template <typename T>
 	const bool above (const T& a, const T& b) {
 		return a>b;
