@@ -564,6 +564,8 @@ namespace glsl {
 		template <typename U, typename V, typename X, typename Y>
 		mat(const vec<U, n>& a, const vec<V, n>& b, const vec<X, n>& c, const vec<Y, n>& d) : data{a,b,c,d} {}
 
+		mat() {}
+
 		template <class... Args>
 		mat(Args... args) : tmp{args...} {
 			unsigned i = 0, j = 0;
