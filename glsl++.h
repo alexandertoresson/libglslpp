@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstdio>
 #include <limits>
+#include <iostream>
 
 #include "glsl++-swizzle.h"
 
@@ -129,6 +130,8 @@ namespace glsl {
 
 	public:
 		typedef T ElemType;
+		template <class U, unsigned m>
+		friend std::ostream& operator<<(std::ostream& os, rvec<U, m> v);
 
 		T &x, &y, &z, &w;
 		T &r, &g, &b, &a;
@@ -198,6 +201,8 @@ namespace glsl {
 
 	public:
 		typedef T ElemType;
+		template <class U, unsigned m>
+		friend std::ostream& operator<<(std::ostream& os, vec<U, m> v);
 
 		T &x, &y, &z, &w;
 		T &r, &g, &b, &a;
@@ -285,6 +290,31 @@ namespace glsl {
 			return rvec<T, 4>(data[a], data[b], data[c], data[d]);
 		}
 	};
+
+	// TODO: Merge this one and the next one
+	template <typename T, unsigned n>
+	std::ostream& operator <<(std::ostream& os, rvec<T, n> v) {
+		os << "(";
+		for (unsigned i = 0; i < n; ++i) {
+			os << v[i];
+			if (i < n-1)
+				os << ", ";
+		}
+		os << ")";
+		return os;
+	}
+
+	template <typename T, unsigned n>
+	std::ostream& operator <<(std::ostream& os, vec<T, n> v) {
+		os << "(";
+		for (unsigned i = 0; i < n; ++i) {
+			os << v[i];
+			if (i < n-1)
+				os << ", ";
+		}
+		os << ")";
+		return os;
+	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
 	vec<bt<U, V>, n> zip (const C1<U, n>& a, const C2<V, n>& b, const bt<U, V> (*func)(const U&, const V&)) {
