@@ -2,6 +2,8 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <ios>
 #include <gtest/gtest.h>
 
 #include "glsl++.h"
@@ -232,6 +234,15 @@ namespace glsl {
 		b = c = a.yzw;
 		EXPECT_EQ(c, a.yzw);
 		EXPECT_EQ(b, a.yzw);
+	}
+
+	TEST(VecTest, HandlesOutputStreaming) {
+		vec<int, 4> a(1, 2, 3, 4);
+		std::stringstream sstream;
+		std::string s;
+		sstream << a;
+		std::getline(sstream, s);
+		EXPECT_EQ("(1, 2, 3, 4)", s);		
 	}
 }
 
