@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <fstream>
+#include <gtest/gtest.h>
 
 #include "glsl++.h"
 
@@ -205,7 +206,8 @@ namespace glsl {
 
 }
 
-int main()
+int main(int argc, char **argv)
 {
-	glsl::main();
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
