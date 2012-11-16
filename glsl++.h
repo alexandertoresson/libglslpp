@@ -317,7 +317,7 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> zip (const C1<U, n>& a, const C2<V, n>& b, const bt<U, V> (*func)(const U&, const V&)) {
+	vec<bt<U, V>, n> zip (const C1<U, n>& a, const C2<V, n>& b, bt<U, V> (*func)(const U&, const V&)) {
 		vec<bt<U, V>, n> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			ret[i] = func(a[i], b[i]);
@@ -326,7 +326,7 @@ namespace glsl {
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
-	C1<T, n>& zip (C1<T, n>& a, const C2<U, n>& b, const void (*func)(T&, const U&)) {
+	C1<T, n>& zip (C1<T, n>& a, const C2<U, n>& b, void (*func)(T&, const U&)) {
 		for (unsigned i = 0; i < n; ++i) {
 			func(a[i], b[i]);
 		}
@@ -334,7 +334,7 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename T, unsigned n> class C>
-	vec<bt<U, V>, n> map (const C<U, n>& a, const V& b, const bt<U, V> (*func)(const U&, const V&)) {
+	vec<bt<U, V>, n> map (const C<U, n>& a, const V& b, bt<U, V> (*func)(const U&, const V&)) {
 		vec<bt<U, V>, n> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			ret[i] = func(a[i], b);
@@ -343,7 +343,7 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<bt<U, V>, n> map (const U& a, const C<V, n>& b, const bt<U, V> (*func)(const U&, const V&)) {
+	vec<bt<U, V>, n> map (const U& a, const C<V, n>& b, bt<U, V> (*func)(const U&, const V&)) {
 		vec<bt<U, V>, n> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			ret[i] = func(a, b[i]);
@@ -352,7 +352,7 @@ namespace glsl {
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	C<T, n>& map (C<T, n>& a, const U& b, const void (*func)(T&, const U&)) {
+	C<T, n>& map (C<T, n>& a, const U& b, void (*func)(T&, const U&)) {
 		for (unsigned i = 0; i < n; ++i) {
 			func(a[i], b);
 		}
@@ -362,7 +362,7 @@ namespace glsl {
 	/* PLUS */
 
 	template <typename T, typename U, typename V>
-	const T plus(const U& a, const V& b) {
+	T plus(const U& a, const V& b) {
 		return a+b;
 	}
 
@@ -382,7 +382,7 @@ namespace glsl {
 	}
 
 	template <typename T, typename U>
-	const void plus_assign(T& a, const U& b) {
+	void plus_assign(T& a, const U& b) {
 		a += b;
 	}
 
@@ -399,7 +399,7 @@ namespace glsl {
 	/* MINUS */
 
 	template <typename T, typename U, typename V>
-	const T minus(const U& a, const V& b) {
+	T minus(const U& a, const V& b) {
 		return a-b;
 	}
 
@@ -419,7 +419,7 @@ namespace glsl {
 	}
 
 	template <typename T, typename U>
-	const void minus_assign(T& a, const U& b) {
+	void minus_assign(T& a, const U& b) {
 		a -= b;
 	}
 
@@ -436,7 +436,7 @@ namespace glsl {
 	/* MULTIPLICATION */
 
 	template <typename T, typename U, typename V>
-	const T mult(const U& a, const V& b) {
+	T mult(const U& a, const V& b) {
 		return a*b;
 	}
 
@@ -456,7 +456,7 @@ namespace glsl {
 	}
 
 	template <typename T, typename U>
-	const void mult_assign(T& a, const U& b) {
+	void mult_assign(T& a, const U& b) {
 		a *= b;
 	}
 
@@ -473,7 +473,7 @@ namespace glsl {
 	/* DIVISION */
 
 	template <typename T, typename U, typename V>
-	const T div(const U& a, const V& b) {
+	T div(const U& a, const V& b) {
 		return a/b;
 	}
 
@@ -493,7 +493,7 @@ namespace glsl {
 	}
 
 	template <typename T, typename U>
-	const void div_assign(T& a, const U& b) {
+	void div_assign(T& a, const U& b) {
 		a /= b;
 	}
 
@@ -521,7 +521,7 @@ namespace glsl {
 	// TODO: Other operators
 
 	template <typename T>
-	const bool above (const T& a, const T& b) {
+	bool above (const T& a, const T& b) {
 		return a>b;
 	}
 
@@ -587,7 +587,7 @@ namespace glsl {
 	};
 
 	template <typename T, unsigned n, unsigned m>
-	mat<T, n, m> zip (const mat<T, n, m>& a, const mat<T, n, m>& b, const T (*func)(const T&, const T&)) {
+	mat<T, n, m> zip (const mat<T, n, m>& a, const mat<T, n, m>& b, T (*func)(const T&, const T&)) {
 		mat<T, n, m> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			for (unsigned j = 0; j < m; ++j) {
