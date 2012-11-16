@@ -214,6 +214,14 @@ namespace glsl {
 		EXPECT_EQ(vec4(vec2(1.0f, 2.0f), vec2(3.0f, 4.0f)), a);
 		EXPECT_EQ(vec4(1.0f, vec3(2.0f, 3.0f, 4.0f)), a);
 	}
+	
+	TEST(VecTest, HandlesSwizzles) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+
+		EXPECT_EQ(vec3(a.xyz), vec3(1.0f, 2.0f, 3.0f));
+		EXPECT_EQ(a.yyww, vec4(2.0f, 2.0f, 4.0f, 4.0f));
+		EXPECT_EQ(a.xyz.xz, vec2(1.0f, 3.0f));
+	}
 }
 
 int main(int argc, char **argv)
