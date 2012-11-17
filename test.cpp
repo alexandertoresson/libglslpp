@@ -118,8 +118,15 @@ namespace glsl {
 		mat4 res(2*a,2*a+1.0f,2*a+2.0f,2*a+3.0f);
 
 		EXPECT_EQ(res, b+c);
+
+		EXPECT_EQ(mat4(a+1.0f, a+1.0f, a+1.0f, a+1.0f), b+1.0f);
+		EXPECT_EQ(mat4(a+1.0f, a+1.0f, a+1.0f, a+1.0f), 1.0f+b);
+
 		b += c;
 		EXPECT_EQ(res, b);
+
+		b += 1.0f;
+		EXPECT_EQ(res+1.0f, b);
 	}
 
 	TEST(MatTest, HandlesSubtraction) {
@@ -128,8 +135,15 @@ namespace glsl {
 		mat4 res(vec4(0.0f), vec4(-1.0f), vec4(-2.0f), vec4(-3.0f));
 
 		EXPECT_EQ(res, b-c);
+
+		EXPECT_EQ(mat4(a-1.0f, a-1.0f, a-1.0f, a-1.0f), b-1.0f);
+		EXPECT_EQ(mat4(1.0f-a, 1.0f-a, 1.0f-a, 1.0f-a), 1.0f-b);
+
 		b -= c;
 		EXPECT_EQ(res, b);
+
+		b -= 1.0f;
+		EXPECT_EQ(res-1.0f, b);
 	}
 
 	TEST(MatTest, HandlesMultiplication) {
