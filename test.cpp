@@ -111,6 +111,48 @@ namespace glsl {
 		// TODO: Constructors from arbitrary combinations of vectors and scalars,
 		//       constructors from matrices of other sizes.
 	}
+
+	TEST(MatTest, HandlesAddition) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+		mat4 b(a, a, a, a), c(a, a+1.0f, a+2.0f, a+3.0f);
+		mat4 res(2*a,2*a+1.0f,2*a+2.0f,2*a+3.0f);
+
+		EXPECT_EQ(res, b+c);
+		b += c;
+		EXPECT_EQ(res, b);
+	}
+
+	TEST(MatTest, HandlesSubtraction) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+		mat4 b(a, a, a, a), c(a, a+1.0f, a+2.0f, a+3.0f);
+		mat4 res(vec4(0.0f), vec4(-1.0f), vec4(-2.0f), vec4(-3.0f));
+
+		EXPECT_EQ(res, b-c);
+		b -= c;
+		EXPECT_EQ(res, b);
+	}
+
+	TEST(MatTest, HandlesMultiplication) {
+		vec3 a(1.0f, 2.0f, 3.0f);
+		vec4 b(1.0f, 2.0f, 3.0f, 4.0f);
+		mat3x4 c(1.0f, 4.0f, 7.0f, 10.0f, 2.0f, 5.0f, 8.0f, 11.0f, 3.0f, 6.0f, 9.0f, 12.0f);
+		mat4x3 d(1.0f, 5.0f, 9.0f, 2.0f, 6.0f, 10.0f, 3.0f, 7.0f, 11.0f, 4.0f, 8.0f, 12.0f);
+		mat4x4 res_mm(38.0f, 83.0f, 128.0f, 173.0f, 44.0f, 98.0f, 152.0f, 206.0f, 50.0f, 113.0f, 176.0f, 239.0f, 56.0f, 128.0f, 200.0f, 272.0f);
+		mat3 res_mm2(30.0f, 66.0f, 102.0f, 36.0f, 81.0f, 126.0f, 42.0f, 96.0f, 150.0f);
+		mat3 e(1.0f, 4.0f, 7.0f, 2.0f, 5.0f, 8.0f, 3.0f, 6.0f, 9.0f);
+		vec4 res_vm(38.0f, 44.0f, 50.0f, 56.0f);
+		vec3 res_mv(30.0f, 70.0f, 110.0f);
+		vec3 res_vm2(30.0f, 36.0f, 42.0f);
+
+		EXPECT_EQ(res_mm, c * d);
+		EXPECT_EQ(res_vm, a * d);
+		EXPECT_EQ(res_mv, d * b);
+
+		a *= e;
+		EXPECT_EQ(res_vm2, a);
+		e *= e;
+		EXPECT_EQ(res_mm2, e);
+	}
 }
 
 int main(int argc, char **argv)
