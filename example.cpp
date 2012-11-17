@@ -169,7 +169,7 @@ namespace glsl {
 	}
 }
 
-int main(int argc, char **argv)
+int main()
 {
 	return glsl::main();
 }
