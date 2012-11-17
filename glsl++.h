@@ -595,6 +595,20 @@ namespace glsl {
 		return mt1 = mt2 * mt2;
 	}
 
+	template <typename U, typename V, unsigned n, unsigned m>
+	bool operator == (const mat<U, n, m>& a, const mat<V, n, m>& b) {
+		for (unsigned i = 0; i < n; ++i) {
+			if (a[i] != b[i])
+				return false;
+		}
+		return true;
+	}
+
+	template <typename U, typename V, unsigned n, unsigned m>
+	bool operator != (const mat<U, n, m>& a, const mat<V, n, m>& b) {
+		return !(a == b);
+	}
+
 	typedef vec<float, 2> vec2;
 	typedef vec<float, 3> vec3;
 	typedef vec<float, 4> vec4;
