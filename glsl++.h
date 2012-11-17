@@ -414,13 +414,23 @@ namespace glsl {
 		a += b;
 	}
 
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
-	C1<T, n>& operator += (C1<T, n>& a, const C2<U, n>& b) {
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n>& operator += (vec<T, n>& a, const C<U, n>& b) {
 		return zip(a, b, plus_assign<T, U>);
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	C<T, n>& operator += (C<T, n> a, const U& b) {
+	rvec<T, n> operator += (rvec<T, n> a, const C<U, n>& b) {
+		return zip(a, b, plus_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	vec<T, n>& operator += (vec<T, n>& a, const U& b) {
+		return map(a, b, plus_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	rvec<T, n> operator += (rvec<T, n> a, const U& b) {
 		return map(a, b, plus_assign<T, U>);
 	}
 
@@ -451,13 +461,23 @@ namespace glsl {
 		a -= b;
 	}
 
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
-	C1<T, n>& operator -= (C1<T, n>& a, const C2<U, n>& b) {
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n>& operator -= (vec<T, n>& a, const C<U, n>& b) {
 		return zip(a, b, minus_assign<T, U>);
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	C<T, n>& operator -= (C<T, n> a, const U& b) {
+	rvec<T, n> operator -= (rvec<T, n> a, const C<U, n>& b) {
+		return zip(a, b, minus_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	vec<T, n>& operator -= (vec<T, n>& a, const U& b) {
+		return map(a, b, minus_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	rvec<T, n> operator -= (rvec<T, n> a, const U& b) {
 		return map(a, b, minus_assign<T, U>);
 	}
 
@@ -488,13 +508,23 @@ namespace glsl {
 		a *= b;
 	}
 
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
-	C1<T, n>& operator *= (C1<T, n>& a, const C2<U, n>& b) {
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n>& operator *= (vec<T, n>& a, const C<U, n>& b) {
 		return zip(a, b, mult_assign<T, U>);
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	C<T, n>& operator *= (C<T, n> a, const U& b) {
+	rvec<T, n> operator *= (rvec<T, n> a, const C<U, n>& b) {
+		return zip(a, b, mult_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	vec<T, n>& operator *= (vec<T, n>& a, const U& b) {
+		return map(a, b, mult_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	rvec<T, n> operator *= (rvec<T, n> a, const U& b) {
 		return map(a, b, mult_assign<T, U>);
 	}
 
@@ -525,13 +555,23 @@ namespace glsl {
 		a /= b;
 	}
 
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
-	C1<T, n>& operator /= (C1<T, n>& a, const C2<U, n>& b) {
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n>& operator /= (vec<T, n>& a, const C<U, n>& b) {
 		return zip(a, b, div_assign<T, U>);
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	C<T, n>& operator /= (C<T, n> a, const U& b) {
+	rvec<T, n> operator /= (rvec<T, n> a, const C<U, n>& b) {
+		return zip(a, b, div_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	vec<T, n>& operator /= (vec<T, n>& a, const U& b) {
+		return map(a, b, div_assign<T, U>);
+	}
+
+	template <typename T, typename U, unsigned n>
+	rvec<T, n> operator /= (rvec<T, n> a, const U& b) {
 		return map(a, b, div_assign<T, U>);
 	}
 
