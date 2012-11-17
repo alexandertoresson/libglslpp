@@ -219,8 +219,18 @@ namespace glsl {
 	
 	TEST(VecTest, HandlesAssignment) {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f), b = a;
+		vec3 c;
 
 		EXPECT_EQ(a, b);
+
+		c = a.yzw;
+		EXPECT_EQ(vec3(2.0f, 3.0f, 4.0f), c);
+		c.xy = vec2(1.0f, 2.0f);
+		EXPECT_EQ(vec3(1.0f, 2.0f, 4.0f), c);
+		c.xy = a.yz;
+		EXPECT_EQ(vec3(2.0f, 3.0f, 4.0f), c);
+		c.zyx.xy = a.zyx.xy;
+		EXPECT_EQ(vec3(2.0f, 2.0f, 3.0f), c);
 	}
 
 	TEST(VecTest, HandlesSwizzles) {
@@ -231,9 +241,6 @@ namespace glsl {
 		EXPECT_EQ(a.xyz, vec3(a.xyz));
 		EXPECT_EQ(vec4(2.0f, 2.0f, 4.0f, 4.0f), a.yyww);
 		EXPECT_EQ(vec2(1.0f, 3.0f), a.xyz.xz);
-		b = c = a.yzw;
-		EXPECT_EQ(c, a.yzw);
-		EXPECT_EQ(b, a.yzw);
 	}
 
 	TEST(VecTest, HandlesOutputStreaming) {
