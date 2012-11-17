@@ -125,6 +125,9 @@ namespace glsl {
 	using bt = typename bigger_type<T, U>::type;
 
 	template <typename T, unsigned n>
+	class vec;
+
+	template <typename T, unsigned n>
 	class rvec
 	{
 		T &c, &d, &e, &f;
@@ -173,6 +176,30 @@ namespace glsl {
 				default:
 					return f;
 			}
+		}
+
+		// TODO: Possible to merge these three operator ='s?
+		rvec<T, n>& operator = (const rvec<T, n>& a) {
+			for (unsigned i = 0; i < n; ++i) {
+				(*this)[i] = a[i];
+			}
+			return *this;
+		}
+
+		template <typename U>
+		rvec<T, n>& operator = (const rvec<U, n>& a) {
+			for (unsigned i = 0; i < n; ++i) {
+				(*this)[i] = a[i];
+			}
+			return *this;
+		}
+
+		template <typename U>
+		rvec<T, n>& operator = (const vec<U, n>& a) {
+			for (unsigned i = 0; i < n; ++i) {
+				(*this)[i] = a[i];
+			}
+			return *this;
 		}
 
 		rvec<T, n> to_rvec() {
