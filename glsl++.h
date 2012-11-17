@@ -9,108 +9,6 @@
 
 namespace glsl {
 
-	// TODO: Make this prettier with C++11
-	template <typename T, typename U>
-	struct bigger_type
-	{	
-	};
-
-	template <>
-	struct bigger_type<float, float>
-	{
-		typedef float type;
-	};
-
-	template <>
-	struct bigger_type<float, double>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<float, int>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<float, unsigned>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<double, double>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<double, float>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<double, int>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<double, unsigned>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<int, double>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<int, float>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<int, int>
-	{
-		typedef int type;
-	};
-
-	template <>
-	struct bigger_type<int, unsigned>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<unsigned, double>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<unsigned, float>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<unsigned, int>
-	{
-		typedef double type;
-	};
-
-	template <>
-	struct bigger_type<unsigned, unsigned>
-	{
-		typedef unsigned type;
-	};
-
 	template <bool b>
 	struct tAssert
 	{
@@ -121,9 +19,6 @@ namespace glsl {
 	{
 		void operator () () {};
 	};
-
-	template <typename T, typename U>
-	using bt = typename bigger_type<T, U>::type;
 
 	template <typename T, unsigned n>
 	class vec;
@@ -717,13 +612,13 @@ namespace glsl {
 	typedef unsigned uint;
 
 	template <typename U, typename V, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, 3> cross(C1<U, 3> v1, C2<V, 3> v2) {
-		return vec<bt<U, V>, 3>(v1[1]*v2[2] - v1[2]*v2[1], v1[2]*v2[0] - v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]);
+	vec<decltype(U()*V()), 3> cross(C1<U, 3> v1, C2<V, 3> v2) {
+		return vec<decltype(U()*V()), 3>(v1[1]*v2[2] - v1[2]*v2[1], v1[2]*v2[0] - v1[0]*v2[2], v1[0]*v2[1] - v1[1]*v2[0]);
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	bt<U, V> dot(C1<U, n> v1, C2<V, n> v2) {
-		bt<U, V> acc = 0.0f;
+	decltype(U()*V()) dot(C1<U, n> v1, C2<V, n> v2) {
+		decltype(U()*V()) acc = 0;
 		for (unsigned i = 0; i < n; ++i) {
 			acc += v1[i]*v2[i];
 		}
@@ -736,7 +631,7 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	bt<U, V> distance(C1<U, n> v1, C2<V, n> v2) {
+	decltype(U()-V()) distance(C1<U, n> v1, C2<V, n> v2) {
 		return length(v1-v2);
 	}
 
@@ -746,40 +641,22 @@ namespace glsl {
 	}
 
 	template <typename U, typename V>
-	bt<U, V> max(U v1, V v2) {
+	decltype(false ? U() : V()) max(U v1, V v2) {
 		return v1 > v2 ? v1 : v2;
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> max(C1<U, n> v1, C2<V, n> v2) {
-		vec<bt<U, V>, n> ret;
+	vec<decltype(false ? U() : V()), n> max(C1<U, n> v1, C2<V, n> v2) {
+		vec<decltype(false ? U() : V()), n> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			ret[i] = max(v1[i], v2[i]);
 		}
 		return ret;
 	}
 
-	template <typename T, unsigned n, template <typename T, unsigned n> class C>
-	T max(C<T, n> v) {
-		T ret = std::numeric_limits<T>::min();
-		for (unsigned i = 0; i < n; ++i) {
-			ret = max(ret, v[i]);
-		}
-		return ret;
-	}
-
 	template <typename U, typename V>
-	bt<U, V> min(U v1, V v2) {
+	decltype(false ? U() : V()) min(U v1, V v2) {
 		return v1 < v2 ? v1 : v2;
-	}
-
-	template <typename T, unsigned n, template <typename T, unsigned n> class C>
-	T min(C<T, n> v) {
-		T ret = std::numeric_limits<T>::max();
-		for (unsigned i = 0; i < n; ++i) {
-			ret = min(ret, v[i]);
-		}
-		return ret;
 	}
 
 	template <typename U>
@@ -797,7 +674,7 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> reflect(C1<U, n> I, C2<V, n> N) {
+	vec<decltype(U()*V()), n> reflect(C1<U, n> I, C2<V, n> N) {
 		return I - 2.0f * dot(N, I) * N;
 	}
 
@@ -811,8 +688,8 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m, template <typename U, unsigned n> class C1, template <typename V, unsigned m> class C2>
-	mat<bt<U, V>, n, m> outerProduct(C1<U, n> v1, C2<V, m> v2) {
-		mat<bt<U, V>, n, m> ret;
+	mat<decltype(U()*V()), n, m> outerProduct(C1<U, n> v1, C2<V, m> v2) {
+		mat<decltype(U()*V()), n, m> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			for (unsigned j = 0; j < m; ++j) {
 				ret[j][i] = v1[i] * v2[j];
@@ -861,13 +738,13 @@ namespace glsl {
 	}
 
 	template <typename U, typename V>
-	bt<U, V> pow(U v1, V v2) {
+	decltype(std::pow(U(), V())) pow(U v1, V v2) {
 		return std::pow(v1, v2);
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> pow(C1<U, n> v1, C2<V, n> v2) {
-		vec<bt<U, V>, n> ret;
+	vec<decltype(std::pow(U(), V())), n> pow(C1<U, n> v1, C2<V, n> v2) {
+		vec<decltype(std::pow(U(), V())), n> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			ret[i] = pow(v1[i], v2[i]);
 		}
@@ -875,18 +752,9 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, typename X>
-	bt<U, V> clamp(U v1, V v2, X v3) {
+	decltype(false ? U() : false ? V() : X()) clamp(U v1, V v2, X v3) {
 		return v1 < v2 ? v2 : v1 > v3 ? v3 : v1;
 	}
-
-	/*template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> pow(C1<U, n> v1, C2<V, n> v2) {
-		vec<bt<U, V>, n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = pow(v1[i], v2[i]);
-		}
-		return ret;
-	}*/
 
 	#define uniform 
 	#define varying 
