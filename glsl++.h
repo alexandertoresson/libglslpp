@@ -467,6 +467,9 @@ namespace glsl {
 		T tmp[n*m];
 
 	public:
+		template <class U, unsigned o, unsigned p>
+		friend std::ostream& operator<<(std::ostream& os, mat<U, o, p> v);
+
 		template <typename U>
 		mat(U v) {
 			for (unsigned i = 0; i < n; ++i) {
@@ -508,6 +511,22 @@ namespace glsl {
 			return data[index];
 		}
 	};
+
+	template <typename T, unsigned n, unsigned m>
+	std::ostream& operator <<(std::ostream& os, mat<T, n, m> v) {
+		os << "(";
+		for (unsigned i = 0; i < n; ++i) {
+			for (unsigned j = 0; j < m; ++j) {
+				os << v[j][i];
+				if (j < m-1)
+					os << ", ";
+				else if (i < n-1)
+					os << "; ";
+			}
+		}
+		os << ")";
+		return os;
+	}
 
 	template <typename T, unsigned n, unsigned m>
 	mat<T, n, m> zip (const mat<T, n, m>& a, const mat<T, n, m>& b, T (*func)(const T&, const T&)) {
