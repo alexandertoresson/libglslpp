@@ -95,6 +95,22 @@ namespace glsl {
 		a.xy -= b.xy;
 		EXPECT_EQ(vec4(-8.0f, -14.0f, -10.0f, -13.0f), a);
 	}
+
+	TEST(MatTest, HandlesConstructors) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+		mat4 b(1.0f), c(a, a, a, a), d(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f, 11.0f, 12.0f, 13.0f, 14.0f, 15.0f, 16.0f);
+
+		EXPECT_EQ(1.0f, d[0][0]); EXPECT_EQ(2.0f, d[0][1]); EXPECT_EQ(3.0f, d[0][2]); EXPECT_EQ(4.0f, d[0][3]);
+		EXPECT_EQ(5.0f, d[1][0]); EXPECT_EQ(6.0f, d[1][1]); EXPECT_EQ(7.0f, d[1][2]); EXPECT_EQ(8.0f, d[1][3]);
+		EXPECT_EQ(9.0f, d[2][0]); EXPECT_EQ(10.0f, d[2][1]); EXPECT_EQ(11.0f, d[2][2]); EXPECT_EQ(12.0f, d[2][3]);
+		EXPECT_EQ(13.0f, d[3][0]); EXPECT_EQ(14.0f, d[3][1]); EXPECT_EQ(15.0f, d[3][2]); EXPECT_EQ(16.0f, d[3][3]);
+		EXPECT_EQ(mat4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), b);
+		EXPECT_EQ(c[0], a); EXPECT_EQ(c[1], a); EXPECT_EQ(c[2], a); EXPECT_EQ(c[3], a);
+		EXPECT_EQ(d, mat4(d));
+
+		// TODO: Constructors from arbitrary combinations of vectors and scalars,
+		//       constructors from matrices of other sizes.
+	}
 }
 
 int main(int argc, char **argv)
