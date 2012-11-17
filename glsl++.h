@@ -528,9 +528,9 @@ namespace glsl {
 		return os;
 	}
 
-	template <typename T, unsigned n, unsigned m>
-	mat<T, n, m> zip (const mat<T, n, m>& a, const mat<T, n, m>& b, T (*func)(const T&, const T&)) {
-		mat<T, n, m> ret;
+	template <typename T, unsigned n, unsigned m, typename F>
+	auto zip (const mat<T, n, m>& a, const mat<T, n, m>& b, F func) -> mat<decltype(func(T(), T())), n, m> {
+		mat<decltype(func(T(), T())), n, m> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			for (unsigned j = 0; j < m; ++j) {
 				ret[i][j] = func(a[i][j], b[i][j]);
@@ -539,19 +539,9 @@ namespace glsl {
 		return ret;
 	}
 
-	template <typename T, typename U, typename V>
-	T plus(const U& a, const V& b) {
-		return a+b;
-	}
-
-	template <typename T, typename U, typename V>
-	T minus(const U& a, const V& b) {
-		return a-b;
-	}
-
 	template <typename T, unsigned n, unsigned m>
 	mat<T, n, m> operator + (const mat<T, n, m>& a, const mat<T, n, m>& b) {
-		return zip(a, b, plus<T>);
+		return zip(a, b, [](T a, T b){ return a+b; });
 	}
 
 	template <typename T, unsigned n, unsigned m>
@@ -561,7 +551,7 @@ namespace glsl {
 
 	template <typename T, unsigned n, unsigned m>
 	mat<T, n, m> operator - (const mat<T, n, m>& a, const mat<T, n, m>& b) {
-		return zip(a, b, minus<T>);
+		return zip(a, b, [](T a, T b){ return a-b; });
 	}
 
 	template <typename T, unsigned n, unsigned m>
