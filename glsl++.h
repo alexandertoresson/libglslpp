@@ -610,8 +610,8 @@ namespace glsl {
 	}
 
 	template <typename T, unsigned m>
-	vec<T, m>& operator *= (vec<T, m>& mt1, const mat<T, m, m>& mt2) {
-		return mt1 = mt2 * mt2;
+	vec<T, m> operator *= (vec<T, m>& mt1, const mat<T, m, m>& mt2) {
+		return mt1 = mt1 * mt2;
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
