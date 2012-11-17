@@ -345,235 +345,190 @@ namespace glsl {
 		return os;
 	}
 
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> zip (const C1<U, n>& a, const C2<V, n>& b, bt<U, V> (*func)(const U&, const V&)) {
-		vec<bt<U, V>, n> ret;
+	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2, typename F>
+	auto zip (const C1<U, n>& a, const C2<V, n>& b, F func) -> vec<decltype(func(U(), V())), n> {
+		vec<decltype(func(U(), V())), n> ret;
 		for (unsigned i = 0; i < n; ++i) {
 			ret[i] = func(a[i], b[i]);
 		}
 		return ret;
 	}
 
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
-	C1<T, n>& zip (C1<T, n>& a, const C2<U, n>& b, void (*func)(T&, const U&)) {
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2, typename F>
+	C1<T, n>& zip (C1<T, n>& a, const C2<U, n>& b, F func) {
 		for (unsigned i = 0; i < n; ++i) {
 			func(a[i], b[i]);
 		}
 		return a;
 	}
 
-	template <typename U, typename V, unsigned n, template <typename T, unsigned n> class C>
-	vec<bt<U, V>, n> map (const C<U, n>& a, const V& b, bt<U, V> (*func)(const U&, const V&)) {
-		vec<bt<U, V>, n> ret;
+	template <typename U, unsigned n, template <typename T, unsigned n> class C, typename F>
+	auto map (const C<U, n>& a, F func) -> vec<decltype(func(U())), n> {
+		vec<decltype(func(U())), n> ret;
 		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = func(a[i], b);
+			ret[i] = func(a[i]);
 		}
 		return ret;
 	}
 
-	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<bt<U, V>, n> map (const U& a, const C<V, n>& b, bt<U, V> (*func)(const U&, const V&)) {
-		vec<bt<U, V>, n> ret;
+	template <typename T, unsigned n, template <typename T, unsigned n> class C, typename F>
+	C<T, n>& map (C<T, n>& a, F func) {
 		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = func(a, b[i]);
-		}
-		return ret;
-	}
-
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	C<T, n>& map (C<T, n>& a, const U& b, void (*func)(T&, const U&)) {
-		for (unsigned i = 0; i < n; ++i) {
-			func(a[i], b);
+			func(a[i]);
 		}
 		return a;
 	}
 
 	/* PLUS */
 
-	template <typename T, typename U, typename V>
-	T plus(const U& a, const V& b) {
-		return a+b;
-	}
-
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> operator + (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, plus<bt<U, V>, U, V>);
+	auto operator + (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()+V()), n> {
+		return zip(a, b, [](U a, V b){ return a+b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<bt<U, V>, n> operator + (const C<U, n>& a, const V& b) {
-		return map(a, b, plus<bt<U, V>, U, V>);
+	auto operator + (const C<U, n>& a, const V& b) -> vec<decltype(U()+V()), n> {
+		return map(a, [=](U a){ return a+b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<bt<U, V>, n> operator + (const U& a, const C<V, n>& b) {
-		return map(a, b, plus<bt<U, V>, U, V>);
+	auto operator + (const U& a, const C<V, n>& b) ->vec<decltype(U()+V()), n>  {
+		return map(b, [=](V b){ return a+b; });
 	}
 
-	template <typename T, typename U>
-	void plus_assign(T& a, const U& b) {
-		a += b;
-	}
-
+	// NOTE: vec is passed by ref, rvec is passed by value
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	vec<T, n>& operator += (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, plus_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a+= b; });
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	rvec<T, n> operator += (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, plus_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a+= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	vec<T, n>& operator += (vec<T, n>& a, const U& b) {
-		return map(a, b, plus_assign<T, U>);
+		return map(a, [=](T& a){ return a+= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	rvec<T, n> operator += (rvec<T, n> a, const U& b) {
-		return map(a, b, plus_assign<T, U>);
+		return map(a, [=](T& a){ return a+= b; });
 	}
 
 	/* MINUS */
 
-	template <typename T, typename U, typename V>
-	T minus(const U& a, const V& b) {
-		return a-b;
-	}
-
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> operator - (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, minus<bt<U, V>, U, V>);
+	auto operator - (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()-V()), n> {
+		return zip(a, b, [](U a, V b){ return a-b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<bt<U, V>, n> operator - (const C<U, n>& a, const V& b) {
-		return map(a, b, minus<bt<U, V>, U, V>);
+	auto operator - (const C<U, n>& a, const V& b) -> vec<decltype(U()-V()), n> {
+		return map(a, [=](U a){ return a-b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<bt<U, V>, n> operator - (const U& a, const C<V, n>& b) {
-		return map(a, b, minus<bt<U, V>, U, V>);
+	auto operator - (const U& a, const C<V, n>& b) ->vec<decltype(U()-V()), n>  {
+		return map(b, [=](V b){ return a-b; });
 	}
 
-	template <typename T, typename U>
-	void minus_assign(T& a, const U& b) {
-		a -= b;
-	}
-
+	// NOTE: vec is passed by ref, rvec is passed by value
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	vec<T, n>& operator -= (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, minus_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a-= b; });
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	rvec<T, n> operator -= (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, minus_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a-= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	vec<T, n>& operator -= (vec<T, n>& a, const U& b) {
-		return map(a, b, minus_assign<T, U>);
+		return map(a, [=](T& a){ return a-= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	rvec<T, n> operator -= (rvec<T, n> a, const U& b) {
-		return map(a, b, minus_assign<T, U>);
+		return map(a, [=](T& a){ return a-= b; });
 	}
 
 	/* MULTIPLICATION */
 
-	template <typename T, typename U, typename V>
-	T mult(const U& a, const V& b) {
-		return a*b;
-	}
-
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> operator * (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, mult<bt<U, V>, U, V>);
+	auto operator * (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()*V()), n> {
+		return zip(a, b, [](U a, V b){ return a*b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<bt<U, V>, n> operator * (const C<U, n>& a, const V& b) {
-		return map(a, b, mult<bt<U, V>, U, V>);
+	auto operator * (const C<U, n>& a, const V& b) -> vec<decltype(U()*V()), n> {
+		return map(a, [=](U a){ return a*b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<bt<U, V>, n> operator * (const U& a, const C<V, n>& b) {
-		return map(a, b, mult<bt<U, V>, U, V>);
+	auto operator * (const U& a, const C<V, n>& b) ->vec<decltype(U()*V()), n>  {
+		return map(b, [=](V b){ return a*b; });
 	}
 
-	template <typename T, typename U>
-	void mult_assign(T& a, const U& b) {
-		a *= b;
-	}
-
+	// NOTE: vec is passed by ref, rvec is passed by value
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	vec<T, n>& operator *= (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, mult_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a*= b; });
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	rvec<T, n> operator *= (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, mult_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a*= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	vec<T, n>& operator *= (vec<T, n>& a, const U& b) {
-		return map(a, b, mult_assign<T, U>);
+		return map(a, [=](T& a){ return a*= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	rvec<T, n> operator *= (rvec<T, n> a, const U& b) {
-		return map(a, b, mult_assign<T, U>);
+		return map(a, [=](T& a){ return a*= b; });
 	}
 
 	/* DIVISION */
 
-	template <typename T, typename U, typename V>
-	T div(const U& a, const V& b) {
-		return a/b;
-	}
-
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<bt<U, V>, n> operator / (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, div<bt<U, V>, U, V>);
+	auto operator / (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()/V()), n> {
+		return zip(a, b, [](U a, V b){ return a/b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<bt<U, V>, n> operator / (const C<U, n>& a, const V& b) {
-		return map(a, b, div<bt<U, V>, U, V>);
+	auto operator / (const C<U, n>& a, const V& b) -> vec<decltype(U()/V()), n> {
+		return map(a, [=](U a){ return a/b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<bt<U, V>, n> operator / (const U& a, const C<V, n>& b) {
-		return map(a, b, div<bt<U, V>, U, V>);
+	auto operator / (const U& a, const C<V, n>& b) ->vec<decltype(U()/V()), n>  {
+		return map(b, [=](V b){ return a/b; });
 	}
 
-	template <typename T, typename U>
-	void div_assign(T& a, const U& b) {
-		a /= b;
-	}
-
+	// NOTE: vec is passed by ref, rvec is passed by value
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	vec<T, n>& operator /= (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, div_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a/= b; });
 	}
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
 	rvec<T, n> operator /= (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, div_assign<T, U>);
+		return zip(a, b, [](T& a, U b){ return a/= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	vec<T, n>& operator /= (vec<T, n>& a, const U& b) {
-		return map(a, b, div_assign<T, U>);
+		return map(a, [=](T& a){ return a/= b; });
 	}
 
 	template <typename T, typename U, unsigned n>
 	rvec<T, n> operator /= (rvec<T, n> a, const U& b) {
-		return map(a, b, div_assign<T, U>);
+		return map(a, [=](T& a){ return a/= b; });
 	}
 
 	/* EQUAL */
@@ -589,14 +544,9 @@ namespace glsl {
 
 	// TODO: Other operators
 
-	template <typename T>
-	bool above (const T& a, const T& b) {
-		return a>b;
-	}
-
-	template <typename T, unsigned n, template <typename T, unsigned n> class C1, template <typename T, unsigned n> class C2>
-	vec<bool, n> operator > (const C1<T, n>& a, const C2<T, n>& b) {
-		return zip(a, b, above<T>);
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
+	vec<bool, n> operator > (const C1<T, n>& a, const C2<U, n>& b) {
+		return zip(a, b, [](T a, U b){ return a>b; });
 	}
 
 	/*template <typename T, unsigned n, template <typename T, unsigned n> class C1, template <typename T, unsigned n> class C2>
@@ -666,6 +616,16 @@ namespace glsl {
 			}
 		}
 		return ret;
+	}
+
+	template <typename T, typename U, typename V>
+	T plus(const U& a, const V& b) {
+		return a+b;
+	}
+
+	template <typename T, typename U, typename V>
+	T minus(const U& a, const V& b) {
+		return a+b;
 	}
 
 	template <typename T, unsigned n, unsigned m>
