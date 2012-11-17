@@ -251,6 +251,46 @@ namespace glsl {
 		std::getline(sstream, s);
 		EXPECT_EQ("(1, 2, 3, 4)", s);		
 	}
+
+	TEST(VecTest, HandlesAddition) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f), b(2.0f, 3.0f, 4.0f, 5.0f);
+
+		EXPECT_EQ(vec4(3.0f, 5.0f, 7.0f, 9.0f), a+b);
+		EXPECT_EQ(vec4(2.0f, 3.0f, 4.0f, 5.0f), a+1.0f);
+		EXPECT_EQ(vec4(2.0f, 3.0f, 4.0f, 5.0f), 1.0f+a);
+		a += 1.0f;
+		EXPECT_EQ(vec4(2.0f, 3.0f, 4.0f, 5.0f), a);
+		a += b;
+		EXPECT_EQ(vec4(4.0f, 6.0f, 8.0f, 10.0f), a);
+		a.xy += 1.0f;
+		EXPECT_EQ(vec4(5.0f, 7.0f, 8.0f, 10.0f), a);
+		a.xy += vec2(1.0f, 2.0f);
+		EXPECT_EQ(vec4(6.0f, 9.0f, 8.0f, 10.0f), a);
+		a += b.xyzw;
+		EXPECT_EQ(vec4(8.0f, 12.0f, 12.0f, 15.0f), a);
+		a.xy += b.xy;
+		EXPECT_EQ(vec4(10.0f, 15.0f, 12.0f, 15.0f), a);
+	}
+
+	TEST(VecTest, HandlesSubtraction) {
+		vec4 a(1.0f, 2.0f, 3.0f, 4.0f), b(2.0f, 4.0f, 6.0f, 8.0f);
+
+		EXPECT_EQ(vec4(-1.0f, -2.0f, -3.0f, -4.0f), a-b);
+		EXPECT_EQ(vec4(0.0f, 1.0f, 2.0f, 3.0f), a-1.0f);
+		EXPECT_EQ(vec4(0.0f, -1.0f, -2.0f, -3.0f), 1.0f-a);
+		a -= 1.0f;
+		EXPECT_EQ(vec4(0.0f, 1.0f, 2.0f, 3.0f), a);
+		a -= b;
+		EXPECT_EQ(vec4(-2.0f, -3.0f, -4.0f, -5.0f), a);
+		a.xy -= 1.0f;
+		EXPECT_EQ(vec4(-3.0f, -4.0f, -4.0f, -5.0f), a);
+		a.xy -= vec2(1.0f, 2.0f);
+		EXPECT_EQ(vec4(-4.0f, -6.0f, -4.0f, -5.0f), a);
+		a -= b.xyzw;
+		EXPECT_EQ(vec4(-6.0f, -10.0f, -10.0f, -13.0f), a);
+		a.xy -= b.xy;
+		EXPECT_EQ(vec4(-8.0f, -14.0f, -10.0f, -13.0f), a);
+	}
 }
 
 int main(int argc, char **argv)
