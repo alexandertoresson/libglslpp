@@ -382,17 +382,17 @@ namespace glsl {
 	/* PLUS */
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	auto operator + (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()+V()), n> {
+	vec<decltype(U()+V()), n>operator + (const C1<U, n>& a, const C2<V, n>& b) {
 		return zip(a, b, [](U a, V b){ return a+b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	auto operator + (const C<U, n>& a, const V& b) -> vec<decltype(U()+V()), n> {
+	vec<decltype(U()+V()), n> operator + (const C<U, n>& a, const V& b) {
 		return map(a, [=](U a){ return a+b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	auto operator + (const U& a, const C<V, n>& b) ->vec<decltype(U()+V()), n>  {
+	vec<decltype(U()+V()), n> operator + (const U& a, const C<V, n>& b) {
 		return map(b, [=](V b){ return a+b; });
 	}
 
@@ -420,17 +420,17 @@ namespace glsl {
 	/* MINUS */
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	auto operator - (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()-V()), n> {
+	vec<decltype(U()-V()), n>operator - (const C1<U, n>& a, const C2<V, n>& b) {
 		return zip(a, b, [](U a, V b){ return a-b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	auto operator - (const C<U, n>& a, const V& b) -> vec<decltype(U()-V()), n> {
+	vec<decltype(U()-V()), n> operator - (const C<U, n>& a, const V& b) {
 		return map(a, [=](U a){ return a-b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	auto operator - (const U& a, const C<V, n>& b) ->vec<decltype(U()-V()), n>  {
+	vec<decltype(U()-V()), n> operator - (const U& a, const C<V, n>& b) {
 		return map(b, [=](V b){ return a-b; });
 	}
 
@@ -458,17 +458,17 @@ namespace glsl {
 	/* MULTIPLICATION */
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	auto operator * (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()*V()), n> {
+	vec<decltype(U()*V()), n>operator * (const C1<U, n>& a, const C2<V, n>& b) {
 		return zip(a, b, [](U a, V b){ return a*b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	auto operator * (const C<U, n>& a, const V& b) -> vec<decltype(U()*V()), n> {
+	vec<decltype(U()*V()), n> operator * (const C<U, n>& a, const V& b) {
 		return map(a, [=](U a){ return a*b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	auto operator * (const U& a, const C<V, n>& b) ->vec<decltype(U()*V()), n>  {
+	vec<decltype(U()*V()), n> operator * (const U& a, const C<V, n>& b) {
 		return map(b, [=](V b){ return a*b; });
 	}
 
@@ -496,17 +496,17 @@ namespace glsl {
 	/* DIVISION */
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	auto operator / (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(U()/V()), n> {
+	vec<decltype(U()/V()), n>operator / (const C1<U, n>& a, const C2<V, n>& b) {
 		return zip(a, b, [](U a, V b){ return a/b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	auto operator / (const C<U, n>& a, const V& b) -> vec<decltype(U()/V()), n> {
+	vec<decltype(U()/V()), n> operator / (const C<U, n>& a, const V& b) {
 		return map(a, [=](U a){ return a/b; });
 	}
 
 	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	auto operator / (const U& a, const C<V, n>& b) ->vec<decltype(U()/V()), n>  {
+	vec<decltype(U()/V()), n> operator / (const U& a, const C<V, n>& b) {
 		return map(b, [=](V b){ return a/b; });
 	}
 
