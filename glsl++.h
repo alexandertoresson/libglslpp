@@ -274,6 +274,14 @@ namespace glsl {
 		return a;
 	}
 
+	template <typename T, unsigned n, template <typename T, unsigned n> class C, typename F>
+	T foldl (const C<T, n>& a, T def, F func) {
+		for (unsigned i = 0; i < n; ++i) {
+			def = func(def, a[i]);
+		}
+		return def;
+	}
+
 	/* PLUS */
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
@@ -430,11 +438,7 @@ namespace glsl {
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
 	bool operator == (const C1<U, n>& a, const C2<V, n>& b) {
-		for (unsigned i = 0; i < n; ++i) {
-			if (a[i] != b[i])
-				return false;
-		}
-		return true;
+		return foldl(zip(a, b, [](U a, V b){ return a==b; }), true, [](bool a, bool b){ return a&&b; });
 	}
 
 	/* NOT EQUAL */
