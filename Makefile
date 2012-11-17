@@ -29,17 +29,24 @@ CXXFLAGS += -g -Wall -Wextra -std=c++11 -Wno-narrowing
 # created to the list.
 TESTS = test
 
+# All examples produced by this Makefile.  Remember to add new examples you
+# created to the list.
+EXAMPLES = example
+
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
 GTEST_HEADERS = /usr/include/gtest/*.h \
                 /usr/include/gtest/internal/*.h
 
+# All libglsl++ headers.
+GLSLPP_HEADERS = $(USER_DIR)/*.h
+
 # House-keeping build targets.
 
-all : $(TESTS)
+all : $(TESTS) $(EXAMPLES)
 
 clean :
-	rm -f $(TESTS) gtest.a gtest_main.a *.o
+	rm -f $(TESTS) $(EXAMPLES) gtest.a gtest_main.a *.o
 
 # Builds gtest.a and gtest_main.a.
 
@@ -69,8 +76,14 @@ gtest_main.a : gtest-all.o gtest_main.o
 # gtest_main.a, depending on whether it defines its own main()
 # function.
 
-test.o : $(USER_DIR)/test.cpp $(GTEST_HEADERS)
+test.o : $(USER_DIR)/test.cpp $(GTEST_HEADERS) $(GLSLPP_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/test.cpp
 
 test : test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+
+example.o: $(USER_DIR)/example.cpp $(GLSLPP_HEADERS)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/example.cpp
+
+example : example.o
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
