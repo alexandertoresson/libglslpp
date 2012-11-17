@@ -539,6 +539,16 @@ namespace glsl {
 		return ret;
 	}
 
+	template <typename U, typename V, unsigned n, unsigned m, typename F>
+	mat<U, n, m>& zip (mat<U, n, m>& a, const mat<V, n, m>& b, F func) {
+		for (unsigned i = 0; i < n; ++i) {
+			for (unsigned j = 0; j < m; ++j) {
+				func(a[i][j], b[i][j]);
+			}
+		}
+		return a;
+	}
+
 	template <typename U, unsigned n, unsigned m, typename F>
 	auto map (const mat<U, n, m>& a, F func) -> mat<decltype(func(U())), n, m> {
 		mat<decltype(func(U())), n, m> ret;
@@ -548,6 +558,16 @@ namespace glsl {
 			}
 		}
 		return ret;
+	}
+
+	template <typename U, unsigned n, unsigned m, typename F>
+	mat<U, n, m>& map (mat<U, n, m>& a, F func) {
+		for (unsigned i = 0; i < n; ++i) {
+			for (unsigned j = 0; j < m; ++j) {
+				func(a[i][j]);
+			}
+		}
+		return a;
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
@@ -566,13 +586,13 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
-	mat<U, n, m> operator += (mat<U, n, m>& a, const mat<V, n, m>& b) {
-		return a = a + b;
+	mat<U, n, m>& operator += (mat<U, n, m>& a, const mat<V, n, m>& b) {
+		return zip(a, b, [](U& a, V b){ a+=b; });
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
-	mat<U, n, m> operator += (mat<U, n, m>& a, const V& b) {
-		return a = a + b;
+	mat<U, n, m>& operator += (mat<U, n, m>& a, const V& b) {
+		return map(a, [=](U& a){ a+=b; });
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
@@ -591,13 +611,13 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
-	mat<U, n, m> operator -= (mat<U, n, m>& a, const mat<V, n, m>& b) {
-		return a = a - b;
+	mat<U, n, m>& operator -= (mat<U, n, m>& a, const mat<V, n, m>& b) {
+		return zip(a, b, [](U& a, V b){ a-=b; });
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m>
-	mat<U, n, m> operator -= (mat<U, n, m>& a, const V& b) {
-		return a = a - b;
+	mat<U, n, m>& operator -= (mat<U, n, m>& a, const V& b) {
+		return map(a, [=](U& a){ a-=b; });
 	}
 
 	template <typename T, unsigned n, unsigned m, unsigned o>
