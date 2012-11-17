@@ -546,7 +546,7 @@ namespace glsl {
 
 	template <typename T, typename U, typename V>
 	T minus(const U& a, const V& b) {
-		return a+b;
+		return a-b;
 	}
 
 	template <typename T, unsigned n, unsigned m>
