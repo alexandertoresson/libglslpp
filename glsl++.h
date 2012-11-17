@@ -8,6 +8,7 @@
 
 namespace glsl {
 
+	// TODO: Make this prettier with C++11
 	template <typename T, typename U>
 	struct bigger_type
 	{	
