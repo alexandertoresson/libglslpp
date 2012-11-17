@@ -437,6 +437,13 @@ namespace glsl {
 		return true;
 	}
 
+	/* NOT EQUAL */
+
+	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
+	bool operator != (const C1<U, n>& a, const C2<V, n>& b) {
+		return !(a == b);
+	}
+
 	// TODO: Other operators
 
 	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2>
