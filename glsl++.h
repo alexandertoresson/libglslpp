@@ -713,11 +713,7 @@ namespace glsl {
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
 	decltype(U()*V()) dot(C1<U, n> v1, C2<V, n> v2) {
-		decltype(U()*V()) acc = 0;
-		for (unsigned i = 0; i < n; ++i) {
-			acc += v1[i]*v2[i];
-		}
-		return acc;
+		return foldl(v1*v2, decltype(U()*V())(), [](decltype(U()*V()) a, decltype(U()*V()) b){ return a+b;});
 	}
 
 	template <typename T, unsigned n, template <typename T, unsigned n> class C>
@@ -741,17 +737,18 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<decltype(false ? U() : V()), n> max(C1<U, n> v1, C2<V, n> v2) {
-		vec<decltype(false ? U() : V()), n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = max(v1[i], v2[i]);
-		}
-		return ret;
+	vec<decltype(max(U(), V())), n> max(const C1<U, n>& v1, const C2<V, n>& v2) {
+		return zip(v1, v2, max<U, V>);
 	}
 
 	template <typename U, typename V>
 	decltype(false ? U() : V()) min(U v1, V v2) {
 		return v1 < v2 ? v1 : v2;
+	}
+
+	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
+	vec<decltype(min(U(), V())), n> min(const C1<U, n>& v1, const C2<V, n>& v2) {
+		return zip(v1, v2, min<U, V>);
 	}
 
 	template <typename U>
@@ -760,12 +757,8 @@ namespace glsl {
 	}
 
 	template <typename T, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n> abs(C<T, n> v) {
-		vec<T, n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = abs(v[i]);
-		}
-		return ret;
+	vec<T, n> abs(const C<T, n>& v) {
+		return map(v, abs<T>);
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
@@ -775,11 +768,7 @@ namespace glsl {
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
 	vec<bool, n> greaterThan(C1<U, n> v1, C2<V, n> v2) {
-		vec<bool, n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = v1[i] > v2[i];
-		}
-		return ret;
+		return zip(v1, v2, [](U a, V b){ return a>b; });
 	}
 
 	template <typename U, typename V, unsigned n, unsigned m, template <typename U, unsigned n> class C1, template <typename V, unsigned m> class C2>
@@ -810,12 +799,8 @@ namespace glsl {
 	}
 
 	template <typename T, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n> cos(C<T, n> v) {
-		vec<T, n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = cos(v[i]);
-		}
-		return ret;
+	vec<T, n> cos(const C<T, n>& v) {
+		return map(v, cos<T>);
 	}
 
 	template <typename U>
@@ -824,12 +809,8 @@ namespace glsl {
 	}
 
 	template <typename T, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n> sin(C<T, n> v) {
-		vec<T, n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = sin(v[i]);
-		}
-		return ret;
+	vec<T, n> sin(const C<T, n>& v) {
+		return map(v, sin<T>);
 	}
 
 	template <typename U, typename V>
@@ -838,17 +819,25 @@ namespace glsl {
 	}
 
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<decltype(std::pow(U(), V())), n> pow(C1<U, n> v1, C2<V, n> v2) {
-		vec<decltype(std::pow(U(), V())), n> ret;
-		for (unsigned i = 0; i < n; ++i) {
-			ret[i] = pow(v1[i], v2[i]);
-		}
-		return ret;
+	vec<decltype(std::pow(U(), V())), n> pow(const C1<U, n>& v1, const C2<V, n>& v2) {
+		return zip(v1, v2, pow<U, V>);
 	}
 
 	template <typename U, typename V, typename X>
-	decltype(false ? U() : false ? V() : X()) clamp(U v1, V v2, X v3) {
-		return v1 < v2 ? v2 : v1 > v3 ? v3 : v1;
+	decltype(min(max(U(), V()), X())) clamp(U v1, V v2, X v3) {
+		return min(max(v1, v2), v3);
+	}
+
+	template <typename U, typename V, typename X, unsigned n, template <typename U, unsigned n> class C>
+	vec<decltype(clamp(U(), V(), X())), n> clamp(const C<U, n>& v1, V v2, X v3) {
+		// TODO: Can this be achieved with std::bind2nd?
+		return map(v1, [=](U v1){ return clamp(v1, v2, v3); });
+	}
+
+	template <typename U, typename V, typename X, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2, template <typename X, unsigned n> class C3>
+	vec<decltype(clamp(U(), V(), X())), n> clamp(const C1<U, n>& v1, const C2<V, n>& v2, const C3<X, n>& v3) {
+		// TODO: zip3?
+		return zip(zip(v1, v2, max<U, V>), v3, min<decltype(max(U(), V())), X>);
 	}
 
 	#define uniform 
