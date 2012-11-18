@@ -671,7 +671,7 @@ namespace glsl {
 
 	template <typename U, typename V, unsigned n, unsigned m>
 	bool operator == (const mat<U, n, m>& a, const mat<V, n, m>& b) {
-		for (unsigned i = 0; i < n; ++i) {
+		for (unsigned i = 0; i < m; ++i) {
 			if (a[i] != b[i])
 				return false;
 		}
