@@ -145,6 +145,12 @@ namespace glsl {
 			}
 		}
 
+		vec(const vec<T, n>& a) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
+			for (unsigned i = 0; i < n; ++i) {
+				data[i] = a[i];
+			}
+		}
+
 		template <typename U, unsigned m, template <typename V, unsigned o> class C>
 		vec(const C<U, m>& a) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
 			tAssert<m <= n>()();

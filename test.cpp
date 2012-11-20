@@ -14,6 +14,9 @@ namespace glsl {
 
 	GLSLTEST(VecTest, HandlesConstructors, {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
+		vec4 b(a);
+
+		b.x = 0.0f;
 
 		EXPECT_EQ(1.0f, a[0]); EXPECT_EQ(2.0f, a[1]); EXPECT_EQ(3.0f, a[2]); EXPECT_EQ(4.0f, a[3]);
 		EXPECT_EQ(vec2(1.0f, 1.0f), vec2(1.0f));
@@ -45,6 +48,10 @@ namespace glsl {
 		EXPECT_EQ(vec3(2.0f, 3.0f, 4.0f), c);
 		c.zyx.xy = a.zyx.xy;
 		EXPECT_EQ(vec3(2.0f, 2.0f, 3.0f), c);
+
+		b.x = 0.0f;
+
+		EXPECT_EQ(vec4(1.0f, 2.0f, 3.0f, 4.0f), a);
 	})
 
 	GLSLTEST(VecTest, HandlesSwizzles, {
