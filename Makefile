@@ -23,7 +23,7 @@ USER_DIR = .
 CPPFLAGS += -I$(GTEST_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -O3 -march=native -Wall -Wextra -std=c++11 -Wno-narrowing
+CXXFLAGS += -g -O3 -march=native -Wall -Wextra -std=c++11 -Wno-narrowing -Wno-unused-parameter
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
