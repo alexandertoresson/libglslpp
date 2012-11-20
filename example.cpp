@@ -162,7 +162,7 @@ namespace glsl {
 			for (int x = 0; x < 720; ++x) {
 				gl_FragCoord = vec4(x, y, 0.0f, 0.0f);
 				glslmain();
-				out << (char) clamp(gl_FragColor.r * 255, 0, 255) << (char) clamp(gl_FragColor.g * 255, 0, 255) << (char) clamp(gl_FragColor.b * 255, 0, 255);
+				out << (unsigned char) clamp(gl_FragColor.r * 255, 0, 255) << (unsigned char) clamp(gl_FragColor.g * 255, 0, 255) << (unsigned char) clamp(gl_FragColor.b * 255, 0, 255);
 			}
 		}
 		return 0;
