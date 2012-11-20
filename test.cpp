@@ -57,7 +57,10 @@ namespace glsl {
 	GLSLTEST(VecTest, HandlesSwizzles, {
 		vec4 a(1.0f, 2.0f, 3.0f, 4.0f);
 		vec3 b, c;
+		mat3 d(1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f);
+		vec3 e(d[2]);
 
+		EXPECT_EQ(7.0f, e.x); EXPECT_EQ(8.0f, e.y); EXPECT_EQ(9.0f, e.z);
 		EXPECT_EQ(vec3(1.0f, 2.0f, 3.0f), a.xyz);
 		EXPECT_EQ(a.xyz, vec3(a.xyz));
 		EXPECT_EQ(vec4(2.0f, 2.0f, 4.0f, 4.0f), a.yyww);
