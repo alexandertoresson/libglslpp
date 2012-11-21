@@ -159,6 +159,7 @@ namespace glsl {
 		gl_TexCoord[0] = vec4(xres, yres, 20.0f, 0.0f);
 		params[0] = vec4(0.8f, 0.8f, 1.0f, 1.0f);
 		params[1] = vec4(0.2f, 0.4f, 0.01f, 3.0f);
+		#pragma omp parallel for schedule(dynamic, 4)
 		for (int y = yres-1; y >= 0; --y) {
 			for (int x = 0; x < xres; ++x) {
 				gl_FragCoord = vec4(x, y, 0.0f, 0.0f);
