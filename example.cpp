@@ -154,19 +154,27 @@ namespace glsl {
 	int main()
 	{
 		std::ofstream out("out.raw");
-		int xres = 1920, yres = 1080;
+		int xres = 720, yres = 480;
+		unsigned char *data = (unsigned char*) malloc(yres*xres*3);
 
 		gl_TexCoord[0] = vec4(xres, yres, 20.0f, 0.0f);
 		params[0] = vec4(0.8f, 0.8f, 1.0f, 1.0f);
 		params[1] = vec4(0.2f, 0.4f, 0.01f, 3.0f);
 		#pragma omp parallel for schedule(dynamic, 4)
-		for (int y = yres-1; y >= 0; --y) {
+		for (int y = 0; y < yres; ++y) {
 			for (int x = 0; x < xres; ++x) {
 				gl_FragCoord = vec4(x, y, 0.0f, 0.0f);
 				glslmain();
-				out << (unsigned char) clamp(gl_FragColor.r * 255, 0, 255) << (unsigned char) clamp(gl_FragColor.g * 255, 0, 255) << (unsigned char) clamp(gl_FragColor.b * 255, 0, 255);
+				data[((yres-y-1)*xres+x)*3] = clamp(gl_FragColor.r * 255, 0, 255);
+				data[((yres-y-1)*xres+x)*3+1] = clamp(gl_FragColor.g * 255, 0, 255);
+				data[((yres-y-1)*xres+x)*3+2] = clamp(gl_FragColor.b * 255, 0, 255);
 			}
 		}
+		// There's probably a better way to do this, something akin to fwrite(), in C++
+		for (long long i = 0; i < yres*xres*3; ++i) {
+			out << data[i];
+		}
+		free(data);
 		return 0;
 	}
 }
