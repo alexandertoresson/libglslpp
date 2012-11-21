@@ -14,42 +14,48 @@
 #include <GL/glext.h>
 
 #define glsl_prelude "\n"\
-"#version 130\n"\
+"#version 150\n"\
 "#define _EXPECT_EQ(expected, actual) "\
-"_libglslpp_counter_++;"\
-"if (gl_FragCoord.x == _libglslpp_counter_)"\
-"gl_FragColor = (expected) == (actual) ? vec4(1.0f) : vec4(0.0f)\n"\
+"do {"\
+	"if (gl_FragCoord.x == _libglslpp_counter_)"\
+		"gl_FragColor = (expected) == (actual) ? vec4(1.0f) : vec4(0.5f);"\
+	"_libglslpp_counter_++;"\
+"} while (false)\n"\
 "#define _EXPECT_FLOAT_EQ(expected, actual) "\
-"_libglslpp_counter_++;"\
-"if (gl_FragCoord.x == _libglslpp_counter_)"\
-"gl_FragColor = (expected) == (actual) ? vec4(1.0f) : vec4(0.0f)\n" /* TODO */ \
+"do {"\
+	"float tmp_e = (expected), tmp_a = (actual);"\
+	"if (gl_FragCoord.x == _libglslpp_counter_)"\
+		"gl_FragColor = (abs(tmp_e - tmp_a) <= (max(tmp_e, tmp_a) * 1.192092896e-7f * 4.0f)) ? vec4(1.0f) : vec4(0.5f);"\
+	"_libglslpp_counter_++;"\
+"} while (false)\n"\
+"layout(pixel_center_integer) in vec4 gl_FragCoord;"\
 "out vec4 gl_FragColor;"
 
 #define GLSLTEST(Test, TestCase, ...) \
 TEST(Test, TestCase) {\
-	test_type_list __list__;\
-	char program[] = glsl_prelude\
+	_test_type_list_ _list_;\
+	char _program_[] = glsl_prelude\
 	"void main(void) {"\
 		"uint _libglslpp_counter_ = 0u;"\
 		#__VA_ARGS__\
 	"}"; /* yo dawg, I herd u liek tests, so I put a test in ur test, so u can test while u test */ \
-	EXPECT_EQ(true, __test_shader__(program));\
-__VA_ARGS__ \
+	__VA_ARGS__ \
+	EXPECT_EQ(true, _test_shader_(_program_, _list_));\
 }
 
-typedef std::vector<int> test_type_list;
+typedef std::vector<unsigned> _test_type_list_;
 
-void __add_test_type_info__(const float& e, test_type_list& list) {
+void _add_test_type_info_(const float& e, _test_type_list_& list) {
 	list.push_back(1);
 }
 
 template <typename T, unsigned n, template <typename T, unsigned n> class C>
-void __add_test_type_info__(const C<T, n>& e, test_type_list& list) {
+void _add_test_type_info_(const C<T, n>& e, _test_type_list_& list) {
 	list.push_back(n);
 }
 
 template <typename T, unsigned n, unsigned m>
-void __add_test_type_info__(const glsl::mat<T, n, m>& e, test_type_list& list) {
+void _add_test_type_info_(const glsl::mat<T, n, m>& e, _test_type_list_& list) {
 	list.push_back(n*m);
 }
 
@@ -57,14 +63,14 @@ void __add_test_type_info__(const glsl::mat<T, n, m>& e, test_type_list& list) {
 	auto tmp_e = expected; \
 	auto tmp_a = actual; \
 	EXPECT_EQ(tmp_e, tmp_a); \
-	__add_test_type_info__(tmp_e, __list__); \
+	_add_test_type_info_(tmp_e, _list_); \
 } while (0)
 
 #define _EXPECT_FLOAT_EQ(expected, actual) do { \
 	auto tmp_e = expected; \
 	auto tmp_a = actual; \
 	EXPECT_FLOAT_EQ(tmp_e, tmp_a); \
-	__add_test_type_info__(tmp_e, __list__); \
+	_add_test_type_info_(tmp_e, _list_); \
 } while (0)
 
 #define checkGLErrors() _checkGLErrors(__LINE__)
@@ -123,9 +129,39 @@ GLuint ParseShader(char* fshader) {
 	return program;
 }
 
-bool __test_shader__(char *shader) {
+GLuint textureId;
+GLuint fboId;
+
+bool _test_shader_(char *shader, const _test_type_list_& list) {
 	GLuint program = ParseShader(shader);
 	if (program) {
+
+		glUseProgram(program);
+
+		glBegin(GL_QUADS);
+
+		glVertex2s(-1, -1);
+
+		glVertex2s(1, -1);
+
+		glVertex2s(1, 1);
+
+		glVertex2s(-1, 1);
+
+		glEnd();
+
+		checkGLErrors();
+
+		glFlush();
+
+		for (unsigned x = 0; x < list.size(); ++x) {
+			float pixel[4];
+			glReadPixels(x, 0, 1, 1, GL_RGBA, GL_FLOAT, pixel);
+			if (pixel[0] != 1.0f) {
+				std::cout << "OpenGL GLSL subtest #" << x << " failed" << std::endl;
+				return false;
+			}
+		}
 		return true;
 	}
 	return false;
@@ -397,6 +433,24 @@ int main(int argc, char **argv) {
 	SDL_Init(SDL_INIT_VIDEO);
 
 	SDL_Surface *screen = SDL_SetVideoMode( 40, 40, 0, SDL_OPENGL);
+
+	glDisable(GL_DEPTH_TEST);
+
+	// create a texture object
+	glGenTextures(1, &textureId);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, 256, 16, 0, GL_RGBA, GL_FLOAT, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	// create a framebuffer object
+	glGenFramebuffersEXT(1, &fboId);
+	glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+
+	// attach the texture to FBO color attachment point
+	glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+                                  GL_TEXTURE_2D, textureId, 0);
 
 	::testing::InitGoogleTest(&argc, argv);
 	int ret = RUN_ALL_TESTS();
