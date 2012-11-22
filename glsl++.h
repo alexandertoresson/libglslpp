@@ -481,6 +481,15 @@ namespace glsl {
 		friend std::ostream& operator<<(std::ostream& os, mat<U, o, p> v);
 
 		template <typename U>
+		mat(mat<U, n, m> v) {
+			for (unsigned i = 0; i < n; ++i) {
+				for (unsigned j = 0; j < m; ++j) {
+					data[j][i] = v[j][i];
+				}
+			}
+		}
+
+		template <typename U>
 		mat(U v) {
 			for (unsigned i = 0; i < n; ++i) {
 				for (unsigned j = 0; j < m; ++j) {
