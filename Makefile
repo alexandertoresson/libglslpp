@@ -23,7 +23,7 @@ USER_DIR = .
 CPPFLAGS += -I$(GTEST_DIR)/include
 
 # Flags passed to the C++ compiler.
-CXXFLAGS += -g -O3 -march=native -Wall -Wextra -std=c++11 -Wno-narrowing -Wno-unused-parameter -lGL -lSDL
+CXXFLAGS += -g -Wall -Wextra -std=c++11 -Wno-narrowing -Wno-unused-parameter
 
 # All tests produced by this Makefile.  Remember to add new tests you
 # created to the list.
@@ -80,10 +80,10 @@ test.o : $(USER_DIR)/test.cpp $(GTEST_HEADERS) $(GLSLPP_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/test.cpp
 
 test : test.o gtest_main.a
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread -lGL -lSDL $^ -o $@
 
 example.o: $(USER_DIR)/example.cpp $(GLSLPP_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $(USER_DIR)/example.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -O3 -march=native -c $(USER_DIR)/example.cpp
 
 example : example.o
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
