@@ -15,6 +15,10 @@
 
 #define glsl_prelude "\n"\
 "#version 150\n"\
+"bool float_eq(float tmp_e, float tmp_a)\n"\
+"{\n"\
+"	return abs(tmp_e - tmp_a) <= (max(tmp_e, tmp_a) * 1.192092896e-7f * 4.0f);\n"\
+"}\n"\
 "#define _EXPECT_EQ(expected, actual) "\
 "do {"\
 	"if (gl_FragCoord.x == _libglslpp_counter_)"\
@@ -25,7 +29,21 @@
 "do {"\
 	"float tmp_e = (expected), tmp_a = (actual);"\
 	"if (gl_FragCoord.x == _libglslpp_counter_)"\
-		"gl_FragColor = (abs(tmp_e - tmp_a) <= (max(tmp_e, tmp_a) * 1.192092896e-7f * 4.0f)) ? vec4(1.0f) : vec4(0.5f);"\
+		"gl_FragColor = float_eq(tmp_e, tmp_a) ? vec4(1.0f) : vec4(0.5f);"\
+	"_libglslpp_counter_++;"\
+"} while (false)\n"\
+"#define _EXPECT_VEC3_EQ(expected, actual) "\
+"do {"\
+	"vec3 tmp_e = (expected), tmp_a = (actual);"\
+	"if (gl_FragCoord.x == _libglslpp_counter_)"\
+		"gl_FragColor = (float_eq(tmp_e.x, tmp_a.x) && float_eq(tmp_e.y, tmp_a.y) && float_eq(tmp_e.z, tmp_a.z)) ? vec4(1.0f) : vec4(0.5f);"\
+	"_libglslpp_counter_++;"\
+"} while (false)\n"\
+"#define _EXPECT_VEC4_EQ(expected, actual) "\
+"do {"\
+	"vec4 tmp_e = (expected), tmp_a = (actual);"\
+	"if (gl_FragCoord.x == _libglslpp_counter_)"\
+		"gl_FragColor = (float_eq(tmp_e.x, tmp_a.x) && float_eq(tmp_e.y, tmp_a.y) && float_eq(tmp_e.z, tmp_a.z) && float_eq(tmp_e.w, tmp_a.w)) ? vec4(1.0f) : vec4(0.5f);"\
 	"_libglslpp_counter_++;"\
 "} while (false)\n"\
 "layout(pixel_center_integer) in vec4 gl_FragCoord;"\
@@ -70,6 +88,25 @@ void _add_test_type_info_(const glsl::mat<T, n, m>& e, _test_type_list_& list) {
 	auto tmp_e = expected; \
 	auto tmp_a = actual; \
 	EXPECT_FLOAT_EQ(tmp_e, tmp_a); \
+	_add_test_type_info_(tmp_e, _list_); \
+} while (0)
+
+#define _EXPECT_VEC3_EQ(expected, actual) do { \
+	auto tmp_e = expected; \
+	auto tmp_a = actual; \
+	EXPECT_FLOAT_EQ(tmp_e.x, tmp_a.x); \
+	EXPECT_FLOAT_EQ(tmp_e.y, tmp_a.y); \
+	EXPECT_FLOAT_EQ(tmp_e.z, tmp_a.z); \
+	_add_test_type_info_(tmp_e, _list_); \
+} while (0)
+
+#define _EXPECT_VEC4_EQ(expected, actual) do { \
+	auto tmp_e = expected; \
+	auto tmp_a = actual; \
+	EXPECT_FLOAT_EQ(tmp_e.x, tmp_a.x); \
+	EXPECT_FLOAT_EQ(tmp_e.y, tmp_a.y); \
+	EXPECT_FLOAT_EQ(tmp_e.z, tmp_a.z); \
+	EXPECT_FLOAT_EQ(tmp_e.w, tmp_a.w); \
 	_add_test_type_info_(tmp_e, _list_); \
 } while (0)
 
