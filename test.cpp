@@ -17,7 +17,7 @@
 "#version 150\n"\
 "bool float_eq(float tmp_e, float tmp_a)\n"\
 "{\n"\
-"	return abs(tmp_e - tmp_a) <= (max(tmp_e, tmp_a) * 1.192092896e-7f * 4.0f);\n"\
+"	return abs(tmp_e - tmp_a) <= (max(abs(tmp_e), abs(tmp_a)) * 1.192092896e-7f * 40.0f);\n"\
 "}\n"\
 "#define _EXPECT_EQ(expected, actual) "\
 "do {"\
