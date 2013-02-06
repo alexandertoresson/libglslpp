@@ -334,12 +334,19 @@ namespace glsl {
 		_EXPECT_EQ(1.0f, abs(1.0f));
 		_EXPECT_EQ(1.0f, abs(-1.0f));
 		_EXPECT_EQ(a, abs(a));
-		_EXPECT_EQ(a, abs(0.0f-a)); // TODO: Change to -a when negation is implemented
+		_EXPECT_EQ(a, abs(-a));
+		_EXPECT_EQ(1.0f, floor(1.5f));
+		_EXPECT_EQ(vec3(0.0f, 1.0f, 1.0f), floor(a*0.6));
+		_EXPECT_EQ(0.5f, fract(1.5f));
+		_EXPECT_VEC3_EQ(vec3(0.6f, 0.2f, 0.8f), fract(a*0.6));
+		_EXPECT_EQ(vec3(-1.0f, 0.0f, 1.0f), sign(a-2.0f));
 		_EXPECT_EQ(0.0f, clamp(-1.0f, 0.0f, 1.0f));
 		_EXPECT_EQ(0.5f, clamp(0.5f, 0.0f, 1.0f));
 		_EXPECT_EQ(1.0f, clamp(1.5f, 0.0f, 1.0f));
 		_EXPECT_EQ(vec3(0.1f, 0.5f, 0.9f), clamp(vec3(-1.0f, 0.5f, 1.5f), vec3(0.1f, 0.0f, 0.0f), vec3(1.0f, 1.0f, 0.9f)));
 		_EXPECT_EQ(vec3(0.0f, 0.5f, 1.0f), clamp(vec3(-1.0f, 0.5f, 1.5f), 0.0f, 1.0f));
+		_EXPECT_FLOAT_EQ(6.0f, mix(0.0f, 10.0f, 0.6f));
+		_EXPECT_VEC3_EQ(vec3(2.5f, 3.5f, 4.5f), mix(a, b, 0.5f));
 	)
 
 	GLSLTEST(VecTest, HandlesGeometricFunctions,

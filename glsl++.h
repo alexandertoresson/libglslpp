@@ -783,6 +783,36 @@ namespace glsl {
 		return map(v, abs<T>);
 	}
 
+	template <typename U>
+	U floor(U v1) {
+		return std::floor(v1);
+	}
+
+	template <typename T, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n> floor(const C<T, n>& v) {
+		return map(v, floor<T>);
+	}
+
+	template <typename U>
+	U fract(U v1) {
+		return v1 - std::floor(v1);
+	}
+
+	template <typename T, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n> fract(const C<T, n>& v) {
+		return map(v, fract<T>);
+	}
+
+	template <typename U>
+	U sign(U v1) {
+		return (U(0) < v1) - (v1 < U(0));;
+	}
+
+	template <typename T, unsigned n, template <typename T, unsigned n> class C>
+	vec<T, n> sign(const C<T, n>& v) {
+		return map(v, sign<T>);
+	}
+
 	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
 	vec<decltype(U()*V()), n> reflect(C1<U, n> I, C2<V, n> N) {
 		return I - 2.0f * dot(N, I) * N;
@@ -861,6 +891,18 @@ namespace glsl {
 		// TODO: zip3?
 		return zip(zip(v1, v2, max<U, V>), v3, min<decltype(max(U(), V())), X>);
 	}
+
+	template <typename U, typename V, typename X>
+	decltype(U() + V() + X()) mix(U v1, V v2, X v3) {
+		return v1 * (1 - v3) + v2 * v3;
+	}
+
+	template <typename U, typename V, typename X, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
+	vec<decltype(mix(U(), V(), X())), n> mix(const C1<U, n>& v1, const C2<V, n>& v2, X v3) {
+		return zip(v1, v2, [=](U v1, V v2){ return mix(v1, v2, v3); });
+	}
+
+	// TODO: mix(vec, vec, vec)
 
 	#define uniform 
 	#define varying 
