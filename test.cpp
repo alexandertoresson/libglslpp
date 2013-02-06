@@ -29,21 +29,36 @@
 "do {"\
 	"float tmp_e = (expected), tmp_a = (actual);"\
 	"if (gl_FragCoord.x == _libglslpp_counter_)"\
-		"gl_FragColor = float_eq(tmp_e, tmp_a) ? vec4(1.0f) : vec4(0.5f);"\
+		"if (gl_FragCoord.y == 0)"\
+			"gl_FragColor = float_eq(tmp_e, tmp_a) ? vec4(1.0f) : vec4(2.0f);"\
+		"else if (gl_FragCoord.y == 1)"\
+			"gl_FragColor = vec4(tmp_e);"\
+		"else if (gl_FragCoord.y == 2)"\
+			"gl_FragColor = vec4(tmp_a);"\
 	"_libglslpp_counter_++;"\
 "} while (false)\n"\
 "#define _EXPECT_VEC3_EQ(expected, actual) "\
 "do {"\
 	"vec3 tmp_e = (expected), tmp_a = (actual);"\
 	"if (gl_FragCoord.x == _libglslpp_counter_)"\
-		"gl_FragColor = (float_eq(tmp_e.x, tmp_a.x) && float_eq(tmp_e.y, tmp_a.y) && float_eq(tmp_e.z, tmp_a.z)) ? vec4(1.0f) : vec4(0.5f);"\
+		"if (gl_FragCoord.y == 0)"\
+			"gl_FragColor = (float_eq(tmp_e.x, tmp_a.x) && float_eq(tmp_e.y, tmp_a.y) && float_eq(tmp_e.z, tmp_a.z)) ? vec4(1.0f) : vec4(2.0f);"\
+		"else if (gl_FragCoord.y == 1)"\
+			"gl_FragColor = vec4(tmp_e, 0.0f);"\
+		"else if (gl_FragCoord.y == 2)"\
+			"gl_FragColor = vec4(tmp_a, 0.0f);"\
 	"_libglslpp_counter_++;"\
 "} while (false)\n"\
 "#define _EXPECT_VEC4_EQ(expected, actual) "\
 "do {"\
 	"vec4 tmp_e = (expected), tmp_a = (actual);"\
 	"if (gl_FragCoord.x == _libglslpp_counter_)"\
-		"gl_FragColor = (float_eq(tmp_e.x, tmp_a.x) && float_eq(tmp_e.y, tmp_a.y) && float_eq(tmp_e.z, tmp_a.z) && float_eq(tmp_e.w, tmp_a.w)) ? vec4(1.0f) : vec4(0.5f);"\
+		"if (gl_FragCoord.y == 0)"\
+			"gl_FragColor = (float_eq(tmp_e.x, tmp_a.x) && float_eq(tmp_e.y, tmp_a.y) && float_eq(tmp_e.z, tmp_a.z) && float_eq(tmp_e.w, tmp_a.w)) ? vec4(1.0f) : vec4(2.0f);"\
+		"else if (gl_FragCoord.y == 1)"\
+			"gl_FragColor = vec4(tmp_e);"\
+		"else if (gl_FragCoord.y == 2)"\
+			"gl_FragColor = vec4(tmp_a);"\
 	"_libglslpp_counter_++;"\
 "} while (false)\n"\
 "layout(pixel_center_integer) in vec4 gl_FragCoord;"\
@@ -192,10 +207,18 @@ bool _test_shader_(char *shader, const _test_type_list_& list) {
 		glFlush();
 
 		for (unsigned x = 0; x < list.size(); ++x) {
-			float pixel[4];
-			glReadPixels(x, 0, 1, 1, GL_RGBA, GL_FLOAT, pixel);
-			if (pixel[0] != 1.0f) {
+			float test[4], e[4], a[4];
+			glReadPixels(x, 0, 1, 1, GL_RGBA, GL_FLOAT, test);
+			glReadPixels(x, 1, 1, 1, GL_RGBA, GL_FLOAT, e);
+			glReadPixels(x, 2, 1, 1, GL_RGBA, GL_FLOAT, a);
+			if (test[0] != 1.0f) {
 				std::cout << "OpenGL GLSL subtest #" << x << " failed" << std::endl;
+				if (test[0] == 2.0f) { // expected/actual available
+					std::cout << "expected " << e[0] << " " << e[1] << " " << e[2] << " " << e[3]
+					          << ", actual " << a[0] << " " << a[1] << " " << a[2] << " " << a[3]
+					          << ", diff " << a[0]-e[0] << " " << a[1]-e[1] << " " << a[2]-e[2] << " " << a[3]-e[3]
+					          << std::endl;
+				}
 				return false;
 			}
 		}
