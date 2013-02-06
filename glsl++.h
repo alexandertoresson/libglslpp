@@ -914,6 +914,19 @@ namespace glsl {
 
 	// TODO: mix(vec, vec, vec)
 
+	template <typename U, typename V, typename X>
+	decltype(U() + V() + X()) smoothstep(U edge0, V edge1, X x) {
+		X t = clamp((x - edge0) / (edge1 - edge0), 0.0, 1.0);
+		return t * t * (3.0 - 2.0 * t);
+	}
+
+	template <typename U, typename V, typename X, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
+	vec<decltype(smoothstep(U(), V(), X())), n> smoothstep(const C1<U, n>& v1, const C2<V, n>& v2, X v3) {
+		return zip(v1, v2, [=](U v1, V v2){ return smoothstep(v1, v2, v3); });
+	}
+
+	// TODO: smoothstep(vec, vec, vec)
+
 	#define uniform 
 	#define varying 
 	#define inout 
