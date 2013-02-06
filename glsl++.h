@@ -865,6 +865,16 @@ namespace glsl {
 		return map(v, sin<T>);
 	}
 
+	template <typename T, typename U>
+	T atan(T v1, U v2) {
+		return std::atan2(v1, v2);
+	}
+
+	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C1, template <typename U, unsigned n> class C2 >
+	vec<T, n> atan(const C1<T, n>& v1, const C2<U, n>& v2) {
+		return zip(v1, v2, atan<T, U>);
+	}
+
 	template <typename U, typename V>
 	decltype(std::pow(U(), V())) pow(U v1, V v2) {
 		return std::pow(v1, v2);

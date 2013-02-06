@@ -339,6 +339,10 @@ namespace glsl {
 		// _EXPECT_FLOAT_EQ can't take vecs as arguments, 'pre-process' with length()
 		_EXPECT_FLOAT_EQ(length(res_cos), length(cos(a)));
 		_EXPECT_FLOAT_EQ(length(res_sin), length(sin(a)));
+		_EXPECT_FLOAT_EQ(pi/2, atan(1.0f, 0.0f));
+		_EXPECT_FLOAT_EQ(-pi/2, atan(-1.0f, 0.0f));
+		_EXPECT_FLOAT_EQ(pi/4, atan(1.0f, 1.0f));
+		_EXPECT_FLOAT_EQ(-pi*3/4, atan(-1.0f, -1.0f));
 	)
 
 	GLSLTEST(VecTest, HandlesExponentialFunctions,
