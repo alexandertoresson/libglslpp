@@ -917,6 +917,7 @@ namespace glsl {
 	#define uniform 
 	#define varying 
 	#define inout 
+	#define out 
 
 	vec4 gl_TexCoord[8];
 	vec4 gl_FragCoord;

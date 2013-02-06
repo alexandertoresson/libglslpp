@@ -153,7 +153,7 @@ namespace glsl {
 
 	int main()
 	{
-		std::ofstream out("out.raw");
+		std::ofstream outfile("out.raw");
 		int xres = 720, yres = 480;
 		unsigned char *data = (unsigned char*) malloc(yres*xres*3);
 
@@ -171,7 +171,7 @@ namespace glsl {
 		}
 		// There's probably a better way to do this, something akin to fwrite(), in C++
 		for (long long i = 0; i < yres*xres*3; ++i) {
-			out << data[i];
+			outfile << data[i];
 		}
 		free(data);
 		return 0;
