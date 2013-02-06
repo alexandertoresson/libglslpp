@@ -470,6 +470,13 @@ namespace glsl {
 		return ret;
 	}*/
 
+	/* NEGATION */
+	
+	template <typename T, unsigned n, template <typename U, unsigned n> class C >
+	vec<T, n> operator - (const C<T, n>& a) {
+		return map(a, [](T a){ return -a; });
+	}
+
 	template <typename T, unsigned n, unsigned m>
 	class mat
 	{

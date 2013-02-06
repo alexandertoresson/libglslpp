@@ -300,6 +300,12 @@ namespace glsl {
 		a.xy -= b.xy;
 		_EXPECT_EQ(vec4(-8.0f, -14.0f, -10.0f, -13.0f), a);
 	)
+	
+	GLSLTEST(VecTest, HandlesNegation,
+		vec4 a = vec4(1.0f, 2.0f, 3.0f, 4.0f);
+
+		_EXPECT_EQ(vec4(-1.0f, -2.0f, -3.0f, -4.0f), -a);
+	)
 
 	GLSLTEST(VecTest, HandlesTrigonometryFunctions,
 		float pi=3.1415926535f;
