@@ -384,8 +384,6 @@ struct shader {
 		int xres = 720, yres = 480;
 		unsigned char *data = (unsigned char*) malloc(yres*xres*3);
 
-		params[0] = vec4(0.8f, 0.8f, 1.0f, 1.0f);
-		params[1] = vec4(0.2f, 0.4f, 0.01f, 3.0f);
 		#pragma omp parallel for schedule(dynamic, 4)
 		for (int y = 0; y < yres; ++y) {
 			for (int x = 0; x < xres; ++x) {
