@@ -83,7 +83,7 @@ test : test.o gtest_main.a
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -lpthread -lGL -lSDL $^ -o $@
 
 example.o: $(USER_DIR)/example.cpp $(GLSLPP_HEADERS)
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -O3 -march=native -c $(USER_DIR)/example.cpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -O3 -march=native -fopenmp -c $(USER_DIR)/example.cpp
 
 example : example.o
-	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -fopenmp $^ -o $@

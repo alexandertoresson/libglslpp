@@ -932,10 +932,6 @@ namespace glsl {
 	#define inout 
 	#define out 
 
-	vec4 gl_TexCoord[8];
-	vec4 gl_FragCoord;
-	vec4 gl_FragColor;
-
 	// TODO:
 	// Dividing by zero - what is correct behavior?
 

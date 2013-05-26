@@ -4,6 +4,8 @@
 
 namespace glsl {
 
+struct shader {
+
 	float eps = 0.0001;
 	float pi = 3.1415926;
 	float pi2 = pi/2.0;
@@ -151,22 +153,30 @@ namespace glsl {
 		gl_FragColor = vec4(pow(c, vec3(1.0 / 1.0)), 1.0);
 	}
 
+	vec4 gl_TexCoord[8];
+	vec4 gl_FragCoord;
+	vec4 gl_FragColor;
+
+};
+
 	int main()
 	{
 		std::ofstream outfile("out.raw");
 		int xres = 720, yres = 480;
 		unsigned char *data = (unsigned char*) malloc(yres*xres*3);
 
-		gl_TexCoord[0] = vec4(xres, yres, 20.0f, 0.0f);
 		params[0] = vec4(0.8f, 0.8f, 1.0f, 1.0f);
 		params[1] = vec4(0.2f, 0.4f, 0.01f, 3.0f);
+		#pragma omp parallel for schedule(dynamic, 4)
 		for (int y = 0; y < yres; ++y) {
 			for (int x = 0; x < xres; ++x) {
-				gl_FragCoord = vec4(x, y, 0.0f, 0.0f);
-				glslmain();
-				data[((yres-y-1)*xres+x)*3] = clamp(gl_FragColor.r * 255, 0, 255);
-				data[((yres-y-1)*xres+x)*3+1] = clamp(gl_FragColor.g * 255, 0, 255);
-				data[((yres-y-1)*xres+x)*3+2] = clamp(gl_FragColor.b * 255, 0, 255);
+				shader sh;
+				sh.gl_TexCoord[0] = vec4(xres, yres, 20.0f, 0.0f);
+				sh.gl_FragCoord = vec4(x, y, 0.0f, 0.0f);
+				sh.glslmain();
+				data[((yres-y-1)*xres+x)*3] = clamp(sh.gl_FragColor.r * 255, 0, 255);
+				data[((yres-y-1)*xres+x)*3+1] = clamp(sh.gl_FragColor.g * 255, 0, 255);
+				data[((yres-y-1)*xres+x)*3+2] = clamp(sh.gl_FragColor.b * 255, 0, 255);
 			}
 		}
 		// There's probably a better way to do this, something akin to fwrite(), in C++
