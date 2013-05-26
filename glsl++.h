@@ -145,6 +145,7 @@ namespace glsl {
 			}
 		}
 
+		// TODO: Necessary?
 		vec(const vec<T, n>& a) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
 			for (unsigned i = 0; i < n; ++i) {
 				data[i] = a[i];
@@ -154,33 +155,51 @@ namespace glsl {
 		template <typename U, unsigned m, template <typename V, unsigned o> class C>
 		vec(const C<U, m>& a) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
 			tAssert<m <= n>()();
-			for (unsigned i = m; i < n; ++i) {
+			unsigned i;
+			for (i = 0; i < m; ++i) {
+				data[i] = a[i];
+			}
+			for (; i < n; ++i) {
 				data[i] = 0;
 			}
-			for (unsigned i = 0; i < m; ++i) {
-				data[i] = a[i];
-			}
-		}
-		
-		template <typename U, class... Args>
-		vec(U v, Args... args) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
-			memcpy(data, vec<T, n>(args...).data, sizeof(data));
-			for (unsigned i = n-1; i >= 1; --i) {
-				data[i] = data[i-1];
-			}
-			data[0] = v;
 		}
 
-		template <typename U, unsigned m, class... Args, template <typename V, unsigned o> class C>
-		vec(const C<U, m>& a, Args... args) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
-			tAssert<m <= n>()();
-			memcpy(data, vec<T, n>(args...).data, sizeof(data));
-			for (unsigned i = n-1; i >= m; --i) {
-				data[i] = data[i-m];
+	private:
+		template <typename U, unsigned m, template <typename V, unsigned o> class C, typename V>
+		static void init(size_t offset, C<U, m>& a, V v) {
+			a.data[offset] = v;
+			for (++offset; offset < m; ++offset) {
+				a.data[offset] = 0;
 			}
+		}
+
+		template <typename W, unsigned p, template <typename V, unsigned o> class C1, typename U, unsigned m, template <typename V, unsigned o> class C2>
+		static void init(size_t offset, C1<W, p>& a, const C2<U, m>& v) {
 			for (unsigned i = 0; i < m; ++i) {
-				data[i] = a[i];
+				a.data[i+offset] = v[i];
 			}
+			for (offset += m; offset < p; ++offset) {
+				a.data[offset] = 0;
+			}
+		}
+
+		template <typename U, unsigned m, template <typename V, unsigned o> class C, typename V, class... Args>
+		static void init(size_t offset, C<U, m>& a, V v, Args... args) {
+			a.data[offset] = v;
+			init(offset+1, a, args...);
+		}
+
+		template <typename W, unsigned p, template <typename V, unsigned o> class C1, typename U, unsigned m, template <typename V, unsigned o> class C2, class... Args>
+		static void init(size_t offset, C1<W, p>& a, const C2<U, m>& v, Args... args) {
+			for (unsigned i = 0; i < m; ++i) {
+				a.data[i+offset] = v[i];
+			}
+			init(offset+m, a, args...);
+		}
+	public:
+		template <class... Args>
+		vec(Args... args) : x(data[0]), y(data[1]), z(data[2]), w(data[3]), r(x), g(y), b(z), a(w), s(x), t(y), p(z), q(w) {
+			init(0, *this, args...);
 		}
 
 		vec<T, n>& operator = (const vec<T, n>& a) {
