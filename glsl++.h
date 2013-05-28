@@ -307,157 +307,108 @@ namespace glsl {
 		return def;
 	}
 
+	template <template <typename U, typename V> class F>
+	struct mapzip {
+		template <typename U, typename V, unsigned n, template <typename, unsigned> class C1, template <typename, unsigned> class C2>
+		auto operator () (const C1<U, n>& a, const C2<V, n>& b) -> vec<decltype(F<U, V>()(U(), V())), n> {
+			vec<decltype(F<U, V>()(U(), V())), n> ret;
+			for (unsigned i = 0; i < n; ++i) {
+				ret[i] = F<U, V>()(a[i], b[i]);
+			}
+			return ret;
+		}
+
+		template <typename T, typename U, unsigned n, template <typename, unsigned> class C1, template <typename, unsigned> class C2>
+		C1<T, n>& operator () (C1<T, n>& a, const C2<U, n>& b) {
+			for (unsigned i = 0; i < n; ++i) {
+				F<T, U>()(a[i], b[i]);
+			}
+			return a;
+		}
+
+		template <typename U, typename V, unsigned n, template <typename, unsigned> class C>
+		auto operator () (const C<U, n>& a, const V& b) -> vec<decltype(F<U, V>()(U(), V())), n> {
+			vec<decltype(F<U, V>()(U(), V())), n> ret;
+			for (unsigned i = 0; i < n; ++i) {
+				ret[i] = F<U, V>()(a[i], b);
+			}
+			return ret;
+		}
+
+		template <typename U, typename V, unsigned n, template <typename, unsigned> class C>
+		auto operator () (const U& a, const C<V, n>& b) -> vec<decltype(F<U, V>()(U(), V())), n> {
+			vec<decltype(F<U, V>()(U(), V())), n> ret;
+			for (unsigned i = 0; i < n; ++i) {
+				ret[i] = F<U, V>()(a, b[i]);
+			}
+			return ret;
+		}
+
+		template <typename T, typename U, unsigned n, template <typename, unsigned> class C>
+		C<T, n>& operator () (C<T, n>& a, const U& b) {
+			for (unsigned i = 0; i < n; ++i) {
+				F<T, U>()(a[i], b);
+			}
+			return a;
+		}
+
+		template <typename U, typename V>
+		auto operator () (const U& a, const V& b) {
+			return F<U, V>()(a, b);
+		}
+
+	};
+
+#define BINFUNC(FUNC, EXPR, NAME) \
+	template <typename U, typename V> \
+	struct NAME { \
+		auto operator () (const U& a, const V& b) -> decltype(EXPR) { \
+			return EXPR; \
+		} \
+	}; \
+ \
+	template <typename U, typename V> \
+	auto FUNC (const U& a, const V& b) { \
+		return mapzip<NAME>()(a, b); \
+	}
+
+#define BINFUNC_ASSIGN(FUNC, EXPR, NAME) \
+	template <typename U, typename V> \
+	struct NAME { \
+		auto operator () (U& a, const V& b) -> decltype(EXPR) { \
+			return EXPR; \
+		} \
+	}; \
+ \
+	template <typename U, unsigned n, typename V> \
+	auto FUNC (rvec<U, n> a, const V& b) { \
+		return mapzip<NAME>()(a, b); \
+	} \
+ \
+	template <typename U, typename V> \
+	auto FUNC (U& a, const V& b) -> U& { \
+		return mapzip<NAME>()(a, b); \
+	}
+
 	/* PLUS */
 
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<decltype(U()+V()), n>operator + (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, [](U a, V b){ return a+b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<decltype(U()+V()), n> operator + (const C<U, n>& a, const V& b) {
-		return map(a, [=](U a){ return a+b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<decltype(U()+V()), n> operator + (const U& a, const C<V, n>& b) {
-		return map(b, [=](V b){ return a+b; });
-	}
-
-	// NOTE: vec is passed by ref, rvec is passed by value
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n>& operator += (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a+= b; });
-	}
-
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	rvec<T, n> operator += (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a+= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	vec<T, n>& operator += (vec<T, n>& a, const U& b) {
-		return map(a, [=](T& a){ return a+= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	rvec<T, n> operator += (rvec<T, n> a, const U& b) {
-		return map(a, [=](T& a){ return a+= b; });
-	}
+	BINFUNC(operator +, a+b, _plus)
+	BINFUNC_ASSIGN(operator +=, a+=b, _plus_assign)
 
 	/* MINUS */
 
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<decltype(U()-V()), n>operator - (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, [](U a, V b){ return a-b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<decltype(U()-V()), n> operator - (const C<U, n>& a, const V& b) {
-		return map(a, [=](U a){ return a-b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<decltype(U()-V()), n> operator - (const U& a, const C<V, n>& b) {
-		return map(b, [=](V b){ return a-b; });
-	}
-
-	// NOTE: vec is passed by ref, rvec is passed by value
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n>& operator -= (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a-= b; });
-	}
-
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	rvec<T, n> operator -= (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a-= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	vec<T, n>& operator -= (vec<T, n>& a, const U& b) {
-		return map(a, [=](T& a){ return a-= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	rvec<T, n> operator -= (rvec<T, n> a, const U& b) {
-		return map(a, [=](T& a){ return a-= b; });
-	}
+	BINFUNC(operator -, a-b, minus)
+	BINFUNC_ASSIGN(operator -=, a-=b, _minus_assign)
 
 	/* MULTIPLICATION */
 
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<decltype(U()*V()), n>operator * (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, [](U a, V b){ return a*b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<decltype(U()*V()), n> operator * (const C<U, n>& a, const V& b) {
-		return map(a, [=](U a){ return a*b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<decltype(U()*V()), n> operator * (const U& a, const C<V, n>& b) {
-		return map(b, [=](V b){ return a*b; });
-	}
-
-	// NOTE: vec is passed by ref, rvec is passed by value
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n>& operator *= (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a*= b; });
-	}
-
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	rvec<T, n> operator *= (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a*= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	vec<T, n>& operator *= (vec<T, n>& a, const U& b) {
-		return map(a, [=](T& a){ return a*= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	rvec<T, n> operator *= (rvec<T, n> a, const U& b) {
-		return map(a, [=](T& a){ return a*= b; });
-	}
+	BINFUNC(operator *, a*b, mult)
+	BINFUNC_ASSIGN(operator *=, a*=b, _mult_assign)
 
 	/* DIVISION */
 
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C1, template <typename V, unsigned n> class C2>
-	vec<decltype(U()/V()), n>operator / (const C1<U, n>& a, const C2<V, n>& b) {
-		return zip(a, b, [](U a, V b){ return a/b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename U, unsigned n> class C>
-	vec<decltype(U()/V()), n> operator / (const C<U, n>& a, const V& b) {
-		return map(a, [=](U a){ return a/b; });
-	}
-
-	template <typename U, typename V, unsigned n, template <typename V, unsigned n> class C>
-	vec<decltype(U()/V()), n> operator / (const U& a, const C<V, n>& b) {
-		return map(b, [=](V b){ return a/b; });
-	}
-
-	// NOTE: vec is passed by ref, rvec is passed by value
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	vec<T, n>& operator /= (vec<T, n>& a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a/= b; });
-	}
-
-	template <typename T, typename U, unsigned n, template <typename T, unsigned n> class C>
-	rvec<T, n> operator /= (rvec<T, n> a, const C<U, n>& b) {
-		return zip(a, b, [](T& a, U b){ return a/= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	vec<T, n>& operator /= (vec<T, n>& a, const U& b) {
-		return map(a, [=](T& a){ return a/= b; });
-	}
-
-	template <typename T, typename U, unsigned n>
-	rvec<T, n> operator /= (rvec<T, n> a, const U& b) {
-		return map(a, [=](T& a){ return a/= b; });
-	}
+	BINFUNC(operator /, a/b, div)
+	BINFUNC_ASSIGN(operator /=, a/=b, _div_assign)
 
 	/* EQUAL */
 
